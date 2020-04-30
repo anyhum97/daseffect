@@ -20,28 +20,32 @@ namespace Simple_2D_Landscape
 
         private void openGLControl1_OpenGLDraw_1(object sender, RenderEventArgs args)
         {
-			// Создаем экземпляр
-            OpenGL gl = this.openGLControl1.OpenGL;
+            // Create a Simple Sample:
+
+            OpenGL gl = openGLControl1.OpenGL;
             
-            // Очистка экрана и буфера глубин
+            // Clear Screen & Depth Buffer
             gl.Clear(OpenGL.GL_COLOR_BUFFER_BIT | OpenGL.GL_DEPTH_BUFFER_BIT);
             
-            // Сбрасываем модельно-видовую матрицу
+            // Reset World Matrix
             gl.LoadIdentity();
             
-            // Двигаем перо вглубь экрана
+            // Move Draw Pointer to -Z coords.
             gl.Translate(0.0f, 0.0f, -5.0f);
             
+            // Begin Drawing
             gl.Begin(OpenGL.GL_TRIANGLES);
             
-            // Указываем цвет вершин
-            gl.Color(1f, 1f, 1f);
+            // Use White Color
+            gl.Color(1.0f, 1.0f, 1.0f);
             
-            gl.Vertex(-1f, -1f);
-            gl.Vertex(0f, 1f);
-            gl.Vertex(1f, -1f);
+            gl.Vertex(-1.0f, -1.0f);
+            gl.Vertex(0.0f, 1.0f);
+            gl.Vertex(1.0f, -1.0f);
             
-            // Завершаем работу
+            // Draw triangle with points(vertex) { { -1.0f, -1.0f }, { 0.0f, 1.0f }, { 1.0f, -1.0f } }
+
+            // Stop Drawing
             gl.End();
         }
     }
