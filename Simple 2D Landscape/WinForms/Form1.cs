@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using SharpGL;
+using Simple_2D_Landscape.LandscapeEngine;
 
 namespace Simple_2D_Landscape
 {
@@ -16,6 +17,10 @@ namespace Simple_2D_Landscape
 		public Form1()
 		{
 			InitializeComponent();
+
+            daseffect<short> test = new daseffect<short>();
+
+
 		}
 
         private void openGLControl1_OpenGLDraw_1(object sender, RenderEventArgs args)
