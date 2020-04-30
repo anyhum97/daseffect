@@ -16,5 +16,25 @@ namespace Simple_2D_Landscape
 		{
 			InitializeComponent();
 		}
+
+		private void openGLControl1_Load(object sender, EventArgs e)
+		{
+
+		}
+
+		private void openGLControl1_GDIDraw(object sender, SharpGL.RenderEventArgs args)
+		{
+
+		}
+
+		private void openGLControl1_OpenGLDraw(object sender, SharpGL.RenderEventArgs args)
+		{
+
+		}
+
+		private void openGLControl1_OpenGLInitialized(object sender, EventArgs e)
+		{
+
+		}
 	}
 }
