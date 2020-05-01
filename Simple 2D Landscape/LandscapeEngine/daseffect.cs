@@ -8,17 +8,31 @@ using System.Windows.Forms;
 
 namespace Simple_2D_Landscape.LandscapeEngine
 {
-	public class daseffect<Type> where Type : struct
+	public class daseffect
 	{
-		private Type[,] _buffer;
-		
-		private Type [][] buf;
+		private float[,] _buffer;
 
-		private delegate Color ColorInterpretator(Type value, Type MinValue, Type MaxValue);	
+		private delegate Color ColorInterpretator(float value, float MinValue, float MaxValue);
 
 		private static readonly ColorInterpretator[] _colorInterpretators;
+		public enum ColorInterpretatorType
+		{
+			Default,
+			Boolean
+		}
+
+		private Random _random = new Random();
+
+		private float _bufferMinValue;
+		private float _bufferMaxValue;
+
+		private bool ReCount { get; set; }
 
 		private bool Ready { get; set; }
+
+		public ColorInterpretatorType _currentColorInterpretator { get; set; } = default;
+		
+		public int RandomSeed { get; private set; }
 
 		public int Width { get; private set; }
 		public int Height { get; private set; }
@@ -34,22 +48,10 @@ namespace Simple_2D_Landscape.LandscapeEngine
 		public daseffect()
 		{
 			Clear();
-
-			if(typeof(Type) != typeof(float)  &&
-			   typeof(Type) != typeof(double) &&
-			   typeof(Type) != typeof(int))
-
-				throw new Exception("> daseffect: Unsupported type Exception");
 		}
 
-		public daseffect(int width, int height)
+		public daseffect(int width, int height, int Seed = 0)
 		{
-			if(typeof(Type) != typeof(float)  &&
-			   typeof(Type) != typeof(double) &&
-			   typeof(Type) != typeof(int))
-
-				throw new Exception("> daseffect: Unsupported type Exception");
-
 			// Min Field is 3x3
 			if(width < 3 || height < 3)
 			{
@@ -57,12 +59,20 @@ namespace Simple_2D_Landscape.LandscapeEngine
 				return;
 			}
 
-			_buffer = new Type[width, height];
+			_buffer = new float[width, height];
+
+			_random = new Random(Seed);
+
+			_bufferMinValue = default;
+			_bufferMaxValue = default;
 
 			Width = width;
 			Height = height;
 
+			ReCount = true;
 			Ready = true;
+
+			Set(Width>>1, Height>>1, 1.0f);
 		}
 
 		private static int CoordinateConvertor(int value, int border)
@@ -91,27 +101,63 @@ namespace Simple_2D_Landscape.LandscapeEngine
 			return value;
 		}
 
-		private static Color GetDefaultColor(Type value, Type MinValue, Type MaxValue)
+		private static Color GetDefaultColor(float value, float MinValue, float MaxValue)
 		{
 			// This Method Returns Color Based on Input Value
 
-			return Color.White;
+			if(value == 0.0f)
+			{
+				return Color.White;
+			}
+
+			if(value < 0.0f)
+			{
+				int intensity = (int)(Math.Floor(255.0f * value / MinValue));
+				return Color.FromArgb(0, 0, intensity);
+			}
+			else
+			{
+				int intensity = (int)(Math.Floor(255.0f-255.0f * value / MaxValue));
+				return Color.FromArgb(intensity, intensity, intensity);
+			}
 		}
 		
+		private Color GetColor(float value)
+		{
+			return _colorInterpretators[(int)_currentColorInterpretator](value, _bufferMinValue, _bufferMaxValue);
+		}
+
 		private void Count()
 		{
-			
+			if(ReCount)
+			{
+				_bufferMinValue = float.MaxValue;
+				_bufferMaxValue = float.MinValue;
+
+				for(int i=0; i<Width; ++i)
+				{
+					for(int j=0; j<Height; ++j)
+					{
+						float value = _buffer[i, j];
+
+						if(value < _bufferMinValue)
+						{
+							_bufferMinValue = value;
+						}
+
+						if(value > _bufferMaxValue)
+						{
+							_bufferMaxValue = value;
+						}
+					}
+				}
+
+				ReCount = false;
+			}
 		}
 
 		public bool IsValid()
 		{
-			if(typeof(Type) != typeof(float)  &&
-			   typeof(Type) != typeof(double) &&
-			   typeof(Type) != typeof(int))
-			{
-				return false;
-			}
-
 			if(Ready == false)
 			{
 				return false;
@@ -139,16 +185,19 @@ namespace Simple_2D_Landscape.LandscapeEngine
 		{
 			_buffer = null;
 
-			//MinValue = default;
-			//MaxValue = default;
+			_currentColorInterpretator = default;
+
+			_bufferMinValue = default;
+			_bufferMaxValue = default;
 			
+			ReCount = true;
 			Ready = false;
 
 			Width = 0;
 			Height = 0;
 		}
 
-		public Type Get(int x, int y)
+		public float Get(int x, int y)
 		{
 			// This Method Allows to Get the Buffer Element
 
@@ -169,7 +218,7 @@ namespace Simple_2D_Landscape.LandscapeEngine
 			return _buffer[x, y];
 		}
 
-		public void Set(int x, int y, Type value)
+		public void Set(int x, int y, float value)
 		{
 			// This Method Allows to Set the Buffer Element
 			
@@ -194,15 +243,20 @@ namespace Simple_2D_Landscape.LandscapeEngine
 		{
 			// This Methode Returns a Bitmap Image Based on Buffer Elements
 
+			if(!IsValid())
+			{
+				return null;
+			}
+
 			Bitmap bitmap = new Bitmap(Width, Height);
 
-			//Type MinValue = 0;
+			Count();
 
 			for(int i=0; i<Width; ++i)
 			{
 				for(int j=0; j<Height; ++j)
 				{
-					//bitmap.SetPixel(i, j, GetDefaultColor(_buffer[x, y]));
+					bitmap.SetPixel(i, j, GetDefaultColor(_buffer[i, j], _bufferMinValue, _bufferMaxValue));
 				}
 			}
 
@@ -212,8 +266,13 @@ namespace Simple_2D_Landscape.LandscapeEngine
 		public void Iteration()
 		{
 			// This Methode Performs one Iteration of Physical Calculations
+			
+			if(!IsValid())
+			{
+				return;
+			}
 
-
+			
 
 
 		}

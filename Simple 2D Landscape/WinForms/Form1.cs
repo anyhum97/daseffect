@@ -14,13 +14,14 @@ namespace Simple_2D_Landscape
 {
 	public partial class Form1 : Form
 	{
+        private daseffect test;
+
 		public Form1()
 		{
 			InitializeComponent();
 
-            daseffect<float> test = new daseffect<float>();
-
-
+            test = new daseffect(128, 128);
+            pictureBox1.Image = test.GetBitmap();
 		}
 
         private void openGLControl1_OpenGLDraw_1(object sender, RenderEventArgs args)
@@ -52,6 +53,12 @@ namespace Simple_2D_Landscape
 
             // Stop Drawing
             gl.End();
+        }
+
+        private void pictureBox1_Click(object sender, EventArgs e)
+        {
+            test.Iteration();
+            pictureBox1.Image = test.GetBitmap();
         }
     }
 }
