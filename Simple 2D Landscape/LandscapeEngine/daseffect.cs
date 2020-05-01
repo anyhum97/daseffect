@@ -43,7 +43,7 @@ namespace Simple_2D_Landscape.LandscapeEngine
 
 		public ColorInterpretatorType CurrentColorInterpretator { get; set; } = default;
 		
-		public const double DefaultCorruptionRate = 1.000;
+		public const double DefaultCorruptionRate = 0.280;
 		
 		public const double MinCorruptionRate = 0.001;
 		public const double MaxCorruptionRate = 1.000;
@@ -90,7 +90,7 @@ namespace Simple_2D_Landscape.LandscapeEngine
 			Clear();
 		}
 
-		public daseffect(int width, int height, int seed = 0, double corruptionRate = 0.95)
+		public daseffect(int width, int height, int seed = 0, double corruptionRate = DefaultCorruptionRate)
 		{
 			// Minimus Buffer Size is [3][3][3];
 
@@ -391,14 +391,14 @@ namespace Simple_2D_Landscape.LandscapeEngine
 			// Now We have Classical Solution of Wave Equation.
 			// If We will Update Less Than 100% Points We Will Have an Interesting Picture...
 
-			_bufferMinValue = float.MaxValue;
-			_bufferMaxValue = float.MinValue;
+			//_bufferMinValue = float.MaxValue;
+			//_bufferMaxValue = float.MinValue;
 
 			for(int x=0; x<Width; ++x)
 			{
 				for(int y=0; y<Height; ++y)
 				{
-					if(_random.NextDouble() <= CorruptionRate || true)
+					if(_random.NextDouble() <= CorruptionRate)
 					{
 						// Get(0, x, y) => t-1  => past;
 						// Get(1, x, y) => t    => now;
@@ -412,13 +412,17 @@ namespace Simple_2D_Landscape.LandscapeEngine
 
 						float futureState = 0.5f*laplacian + 2.0f*Get(1, x, y) - Get(0, x, y);
 
-						if(futureState < _bufferMinValue)
-							_bufferMinValue = futureState;
+						//if(futureState < _bufferMinValue)
+						//	_bufferMinValue = futureState;
 
-						if(futureState > _bufferMaxValue)
-							_bufferMaxValue = futureState;
+						//if(futureState > _bufferMaxValue)
+						//	_bufferMaxValue = futureState;
 
 						_buffer[2][x][y] = futureState;
+					}
+					else
+					{
+						_buffer[2][x][y] = _buffer[1][x][y];
 					}
 				}
 			}

@@ -45,7 +45,7 @@ namespace Simple_2D_Landscape
 		{
 			InitializeComponent();
 
-            _test = new daseffect(128, 128);
+            _test = new daseffect(256, 256);
             SetPicture(_test.GetBitmap());
 
             _timer = new Timer();
