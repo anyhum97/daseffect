@@ -10,7 +10,7 @@ namespace Simple_2D_Landscape.LandscapeEngine
 {
 	public class daseffect
 	{
-		private float[][][] _buffer;	// [Dimensions][Width][Height];
+		private float[][][] Buffer { get; set; }	// [Dimensions][Width][Height];
 
 		private delegate Color ColorInterpretator(float value, float MinValue, float MaxValue);
 
@@ -43,7 +43,7 @@ namespace Simple_2D_Landscape.LandscapeEngine
 
 		public ColorInterpretatorType CurrentColorInterpretator { get; set; } = default;
 		
-		public const double DefaultCorruptionRate = 0.280;
+		public const double DefaultCorruptionRate = 0.950;
 		
 		public const double MinCorruptionRate = 0.001;
 		public const double MaxCorruptionRate = 1.000;
@@ -100,7 +100,7 @@ namespace Simple_2D_Landscape.LandscapeEngine
 				return;
 			}
 
-			_buffer = new float[3][][];
+			Buffer = new float[3][][];
 
 			// Note: First Dimension of Buffer is Responsible for Time
 			// We Need Three Time-Shots to Provide Operations with Second Derivative.
@@ -113,11 +113,11 @@ namespace Simple_2D_Landscape.LandscapeEngine
 			{
 				// Allocate [Width] x [Height] Field;
 
-				_buffer[i] = new float[width][];
+				Buffer[i] = new float[width][];
 
 				for(int j=0; j<width; ++j)
 				{
-					_buffer[i][j] = new float[height];
+					Buffer[i][j] = new float[height];
 				}
 			}
 
@@ -135,34 +135,8 @@ namespace Simple_2D_Landscape.LandscapeEngine
 			ReCount = true;
 			Ready = true;
 
-			Set(0, Width>>1, Height>>1, 1.0f);
-			Set(1, Width>>1, Height>>1, 1.0f);
-		}
-
-		private static int CoordinateConvertor(int value, int border)
-		{
-			// This Method Converts Buffer Coordinates in a Certain Way:
-			
-			// border => 4;
-
-			// In:  [-9, -8, -7, -6, -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
-			// Out: [ 3,  0,  1,  2,  3,  0,  1,  2,  3, 0, 1, 2, 3, 0, 1, 2, 3, 0, 1];
-			
-			// It helps to close the Buffer.
-
-			////////////////////////////////////////////////////////////////////////
-
-			if(value < 0)
-			{
-				value = value % border + border;
-			}
-
-			if(value >= border)
-			{
-				value = value % border;
-			}
-
-			return value;
+			Buffer[0][Width>>1][Height>>1] = 1.0f;
+			Buffer[1][Width>>1][Height>>1] = 1.0f;
 		}
 
 		private static Color GetDefaultColor(float value, float MinValue, float MaxValue)
@@ -191,6 +165,11 @@ namespace Simple_2D_Landscape.LandscapeEngine
 			return _colorInterpretators[(int)CurrentColorInterpretator](value, _bufferMinValue, _bufferMaxValue);
 		}
 
+		private bool IsHappened()
+		{
+			return _random.NextDouble() <= CorruptionRate;
+		}
+
 		private void Count(int dim = 1)
 		{
 			if(ReCount)
@@ -202,7 +181,7 @@ namespace Simple_2D_Landscape.LandscapeEngine
 				{
 					for(int j=0; j<Height; ++j)
 					{
-						float value = _buffer[dim][i][j];
+						float value = Buffer[dim][i][j];
 
 						if(value < _bufferMinValue)
 						{
@@ -227,7 +206,7 @@ namespace Simple_2D_Landscape.LandscapeEngine
 				return false;
 			}
 
-			if(_buffer == null)
+			if(Buffer == null)
 			{
 				return false;
 			}
@@ -239,7 +218,7 @@ namespace Simple_2D_Landscape.LandscapeEngine
 
 			try
 			{
-				float value = _buffer[2][Width-1][Height-1];
+				float value = Buffer[2][Width-1][Height-1];
 			}
 			catch
 			{
@@ -251,7 +230,7 @@ namespace Simple_2D_Landscape.LandscapeEngine
 
 		public void Clear()
 		{
-			_buffer = null;
+			Buffer = null;
 
 			_bufferMinValue = default;
 			_bufferMaxValue = default;
@@ -266,58 +245,6 @@ namespace Simple_2D_Landscape.LandscapeEngine
 
 			Width = 0;
 			Height = 0;
-		}
-
-		public float Get(int dim, int x, int y)
-		{
-			// This Method Allows to Get the Buffer Element
-
-			////////////////////////////////////////////////////////////////////////
-
-			if(!Ready)
-			{
-				throw new Exception("> daseffect: Used Invalid Instance");
-			}
-
-			if(dim >= 3)
-			{
-				throw new ArgumentException();
-			}
-
-			////////////////////////////////////////////////////////////////////////
-
-			x = CoordinateConvertor(x, Width);
-			y = CoordinateConvertor(y, Height);
-
-			////////////////////////////////////////////////////////////////////////
-
-			return _buffer[dim][x][y];
-		}
-
-		public void Set(int dim, int x, int y, float value)
-		{
-			// This Method Allows to Set the Buffer Element
-			
-			////////////////////////////////////////////////////////////////////////
-
-			if(!Ready)
-			{
-				throw new Exception("> daseffect: Used Invalid Instance");
-			}
-
-			if(dim >= 3)
-			{
-				throw new ArgumentException();
-			}
-
-			////////////////////////////////////////////////////////////////////////
-
-			x = CoordinateConvertor(x, Width);
-			y = CoordinateConvertor(y, Height);
-
-			////////////////////////////////////////////////////////////////////////
-			
-			_buffer[dim][x][y] = value;
 		}
 
 		public Bitmap GetBitmap(int dim = 1)
@@ -337,7 +264,7 @@ namespace Simple_2D_Landscape.LandscapeEngine
 			{
 				for(int j=0; j<Height; ++j)
 				{
-					bitmap.SetPixel(i, j, GetDefaultColor(_buffer[dim][i][j], _bufferMinValue, _bufferMaxValue));
+					bitmap.SetPixel(i, j, GetDefaultColor(Buffer[dim][i][j], _bufferMinValue, _bufferMaxValue));
 				}
 			}
 
@@ -354,8 +281,8 @@ namespace Simple_2D_Landscape.LandscapeEngine
 			{
 				return;
 			}
-
-			//********Original Physical Model********
+			
+			/////////////////////////////********Original Physical Model********////////////////////////////
 
 			// Uses the Wave Equation in a Nonlinear Physical Environment.
 			// Nonlinear Physical Environment is Emulated by Random Numbers.
@@ -391,50 +318,210 @@ namespace Simple_2D_Landscape.LandscapeEngine
 			// Now We have Classical Solution of Wave Equation.
 			// If We will Update Less Than 100% Points We Will Have an Interesting Picture...
 
-			//_bufferMinValue = float.MaxValue;
-			//_bufferMaxValue = float.MinValue;
+			////////////////////////////////////////////////////////////////////////////////////////////////
 
-			for(int x=0; x<Width; ++x)
+			const float velocity = 0.5f;	// Phase Speed;
+
+			// Cycle Optimization Picture:
+
+			// 0##########0
+			// #xxxxxxxxxx#
+			// #xxxxxxxxxx#
+			// #xxxxxxxxxx#
+			// #xxxxxxxxxx#
+			// 0##########0
+
+			// Make Calculation for Top-Left Point:
+
+			if(IsHappened())
 			{
-				for(int y=0; y<Height; ++y)
+				float laplacian =  Buffer[1][1][0] + 
+								   Buffer[1][Width-1][0] + 
+								   Buffer[1][0][Height-1] + 
+								   Buffer[1][0][1] - 4.0f * 
+								   Buffer[1][0][0];
+
+				float futureValue = 2.0f*Buffer[1][0][0] - Buffer[0][0][0] + velocity*laplacian;
+
+				Buffer[2][0][0] = futureValue;
+			}
+			else
+			{
+				Buffer[2][0][0] = Buffer[2][0][0];	// Point Was Not Updated;
+			}
+
+
+			// Make Calculation for Top-Right Point:
+
+			if(IsHappened())
+			{
+				float laplacian =  Buffer[1][0][0] + 
+								   Buffer[1][Width-2][0] + 
+								   Buffer[1][Width-1][Height-1] + 
+								   Buffer[1][Width-1][1] - 4.0f * 
+								   Buffer[1][Width-1][0];
+
+				float futureValue = 2.0f*Buffer[1][Width-1][0] - Buffer[0][Width-1][0] + velocity*laplacian;
+
+				Buffer[2][Width-1][0] = futureValue;
+			}
+			else
+			{
+				Buffer[2][Width-1][0] = Buffer[1][Width-1][0];	// Point Was Not Updated;
+			}
+
+			// Make Calculation for Down-Left Point:
+			
+			if(IsHappened())
+			{
+				float laplacian =  Buffer[1][1][Height-1] + 
+								   Buffer[1][Width-1][Height-1] + 
+								   Buffer[1][0][Height-2] + 
+								   Buffer[1][0][0] - 4.0f * 
+								   Buffer[1][0][Height-1];
+
+				float futureValue = 2.0f*Buffer[1][0][Height-1] - Buffer[0][0][Height-1] + velocity*laplacian;
+
+				Buffer[2][0][Height-1] = futureValue;
+			}
+			else
+			{
+				Buffer[2][0][Height-1] = Buffer[1][0][Height-1];	// Point Was Not Updated;
+			}
+
+			// Make Calculation for Down-Right Point:
+
+			if(IsHappened())
+			{
+				float laplacian =  Buffer[1][0][Height-1] + 
+								   Buffer[1][Width-2][Height-1] + 
+								   Buffer[1][Width-1][Height-2] + 
+								   Buffer[1][Width-1][0] - 4.0f * 
+								   Buffer[1][Width-1][Height-1];
+
+				float futureValue = 2.0f*Buffer[1][Width-1][Height-1] - Buffer[0][Width-1][Height-1] + velocity*laplacian;
+
+				Buffer[2][Width-1][Height-1] = futureValue;
+			}
+			else
+			{
+				Buffer[2][Width-1][Height-1] = Buffer[1][Width-1][Height-1];	// Point Was Not Updated;
+			}
+
+			for(int i=1; i<Width-1; ++i)
+			{
+				// Make Calculation for Top Border:
+
+				if(IsHappened())
 				{
-					if(_random.NextDouble() <= CorruptionRate)
-					{
-						// Get(0, x, y) => t-1  => past;
-						// Get(1, x, y) => t    => now;
-						// Get(2, x, y) => t+1  => future;
+					float laplacian = Buffer[1][i+1][0] + 
+									   Buffer[1][i-1][0] + 
+									   Buffer[1][i][Height-1] + 
+									   Buffer[1][i][1] - 4.0f * 
+									   Buffer[1][i][0];
 
-						float laplacian = Get(1, x + 1, y) +
-										  Get(1, x - 1, y) +
-										  Get(1, x, y + 1) +
-										  Get(1, x, y - 1) - 4.0f *
-										  Get(1, x, y);
+					float futureValue = 2.0f*Buffer[1][i][0] - Buffer[0][i][0] + velocity*laplacian;
 
-						float futureState = 0.5f*laplacian + 2.0f*Get(1, x, y) - Get(0, x, y);
+					Buffer[2][i][0] = futureValue;
+				}
+				else
+				{
+					Buffer[2][i][0] = Buffer[1][i][0];	// Point Was Not Updated;
+				}
 
-						//if(futureState < _bufferMinValue)
-						//	_bufferMinValue = futureState;
+				// Make Calculation for Down Border:
+				if(IsHappened())
+				{
+					float laplacian = Buffer[1][i+1][Height-1] + 
+									   Buffer[1][i-1][Height-1] + 
+									   Buffer[1][i][Height-2] + 
+									   Buffer[1][i][0] - 4.0f * 
+									   Buffer[1][i][Height-1];
 
-						//if(futureState > _bufferMaxValue)
-						//	_bufferMaxValue = futureState;
+					float futureValue = 2.0f*Buffer[1][i][Height-1] - Buffer[0][i][Height-1] + velocity*laplacian;
 
-						_buffer[2][x][y] = futureState;
-					}
-					else
-					{
-						_buffer[2][x][y] = _buffer[1][x][y];
-					}
+					Buffer[2][i][Height-1] = futureValue;
+				}
+				else
+				{
+					Buffer[2][i][Height-1] = Buffer[1][i][Height-1];	// Point Was Not Updated;
 				}
 			}
 
-			// Push Buffers
+			for(int i=1; i<Height-1; ++i)
+			{
+				// Make Calculation for Left Border:
 
-			float[][] link = _buffer[0];
+				if(IsHappened())
+				{
+					float laplacian = Buffer[1][1][i] + 
+									   Buffer[1][Width-1][i] + 
+									   Buffer[1][0][i+1] + 
+									   Buffer[1][0][i-1] - 4.0f * 
+									   Buffer[1][0][i];
 
-			_buffer[0] = _buffer[1];
-			_buffer[1] = _buffer[2];
+					float futureValue = 2.0f*Buffer[1][0][i] - Buffer[0][0][i] + velocity*laplacian;
+
+					Buffer[2][0][i] = futureValue;
+				}
+				else
+				{
+					Buffer[2][0][i] = Buffer[1][0][i];	// Point Was Not Updated;
+				}
+
+				// Make Calculation for Right Border:
+
+				if(IsHappened())
+				{
+					float laplacian =  Buffer[1][0][i] + 
+									   Buffer[1][Width-2][i] + 
+									   Buffer[1][Width-1][i+1] + 
+									   Buffer[1][Width-1][i-1] - 4.0f * 
+									   Buffer[1][Width-1][i];
+
+					float futureValue = 2.0f*Buffer[1][Width-1][i] - Buffer[0][Width-1][i] + velocity*laplacian;
+
+					Buffer[2][Width-1][i] = futureValue;
+				}
+				else
+				{
+					Buffer[2][Width-1][i] = Buffer[1][Width-1][i];	// Point Was Not Updated;
+				}
+			}
+
+			for(int i=1; i<Width-1; ++i)
+			{
+				for(int j=1; j<Height-1; ++j)
+				{
+					// Make Calculation for Internal Points:
+					
+					if(IsHappened())
+					{
+						float laplacian =  Buffer[1][i+1][j] + 
+										   Buffer[1][i-1][j] + 
+										   Buffer[1][i][j+1] + 
+										   Buffer[1][i][j-1] - 4.0f * 
+										   Buffer[1][i][j];
+
+						float futureValue = 2.0f*Buffer[1][i][j] - Buffer[0][i][j] + velocity*laplacian;
+
+						Buffer[2][i][j] = futureValue;
+					}
+					else
+					{
+						Buffer[2][i][j] = Buffer[1][i][j];	// Point Was Not Updated;
+					}
+				}
+			}			
+
+			// Push Buffers:
+
+			float[][] link = Buffer[0];
+
+			Buffer[0] = Buffer[1];
+			Buffer[1] = Buffer[2];
 			
-			_buffer[2] = link;
+			Buffer[2] = link;
 
 			ReCount = true;
 		}
