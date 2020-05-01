@@ -18,7 +18,7 @@ namespace Simple_2D_Landscape
 		{
 			InitializeComponent();
 
-            daseffect<short> test = new daseffect<short>();
+            daseffect<float> test = new daseffect<float>();
 
 
 		}

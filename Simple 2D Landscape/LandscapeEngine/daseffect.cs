@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -10,9 +11,25 @@ namespace Simple_2D_Landscape.LandscapeEngine
 	public class daseffect<Type> where Type : struct
 	{
 		private Type[,] _buffer;
+		
+		private Type [][] buf;
+
+		private delegate Color ColorInterpretator(Type value, Type MinValue, Type MaxValue);	
+
+		private static readonly ColorInterpretator[] _colorInterpretators;
+
+		private bool Ready { get; set; }
 
 		public int Width { get; private set; }
 		public int Height { get; private set; }
+
+		static daseffect()
+		{
+			_colorInterpretators = new ColorInterpretator[]
+			{
+				GetDefaultColor
+			};
+		}
 
 		public daseffect()
 		{
@@ -22,7 +39,7 @@ namespace Simple_2D_Landscape.LandscapeEngine
 			   typeof(Type) != typeof(double) &&
 			   typeof(Type) != typeof(int))
 
-				throw new Exception("daseffect: UnSupported type Exception");
+				throw new Exception("> daseffect: Unsupported type Exception");
 		}
 
 		public daseffect(int width, int height)
@@ -31,48 +48,21 @@ namespace Simple_2D_Landscape.LandscapeEngine
 			   typeof(Type) != typeof(double) &&
 			   typeof(Type) != typeof(int))
 
-				throw new Exception("daseffect: Unsupported type Exception");
+				throw new Exception("> daseffect: Unsupported type Exception");
 
+			// Min Field is 3x3
 			if(width < 3 || height < 3)
 			{
 				Clear();
 				return;
 			}
 
+			_buffer = new Type[width, height];
+
 			Width = width;
 			Height = height;
 
-			_buffer = new Type[width, height];
-		}
-
-		public bool IsValid()
-		{
-			if(typeof(Type) != typeof(float)  &&
-			   typeof(Type) != typeof(double) &&
-			   typeof(Type) != typeof(int))
-			{
-				return false;
-			}
-
-			if(_buffer == null)
-			{
-				return false;
-			}
-
-			if(Width < 3 || Height < 3)
-			{
-				return false;
-			}
-
-			return true;
-		}
-
-		public void Clear()
-		{
-			_buffer = null;
-
-			Width = 0;
-			Height = 0;
+			Ready = true;
 		}
 
 		private static int CoordinateConvertor(int value, int border)
@@ -101,10 +91,74 @@ namespace Simple_2D_Landscape.LandscapeEngine
 			return value;
 		}
 
+		private static Color GetDefaultColor(Type value, Type MinValue, Type MaxValue)
+		{
+			// This Method Returns Color Based on Input Value
+
+			return Color.White;
+		}
+		
+		private void Count()
+		{
+			
+		}
+
+		public bool IsValid()
+		{
+			if(typeof(Type) != typeof(float)  &&
+			   typeof(Type) != typeof(double) &&
+			   typeof(Type) != typeof(int))
+			{
+				return false;
+			}
+
+			if(Ready == false)
+			{
+				return false;
+			}
+
+			if(_buffer == null)
+			{
+				return false;
+			}
+
+			if(_buffer.Length < 9)
+			{
+				return false;
+			}
+
+			if(Width < 3 || Height < 3)
+			{
+				return false;
+			}
+
+			return true;
+		}
+
+		public void Clear()
+		{
+			_buffer = null;
+
+			//MinValue = default;
+			//MaxValue = default;
+			
+			Ready = false;
+
+			Width = 0;
+			Height = 0;
+		}
+
 		public Type Get(int x, int y)
 		{
-			// This Method Allows to get the Buffer Element
-			
+			// This Method Allows to Get the Buffer Element
+
+			////////////////////////////////////////////////////////////////////////
+
+			if(!Ready)
+			{
+				throw new Exception("> daseffect: Used Invalid Instance");
+			}
+
 			////////////////////////////////////////////////////////////////////////
 
 			x = CoordinateConvertor(x, Width);
@@ -117,8 +171,15 @@ namespace Simple_2D_Landscape.LandscapeEngine
 
 		public void Set(int x, int y, Type value)
 		{
-			// This Method Allows to set the Buffer Element
+			// This Method Allows to Set the Buffer Element
 			
+			////////////////////////////////////////////////////////////////////////
+
+			if(!Ready)
+			{
+				throw new Exception("> daseffect: Used Invalid Instance");
+			}
+
 			////////////////////////////////////////////////////////////////////////
 
 			x = CoordinateConvertor(x, Width);
@@ -129,6 +190,32 @@ namespace Simple_2D_Landscape.LandscapeEngine
 			_buffer[x, y] = value;
 		}
 
+		public Bitmap GetBitmap()
+		{
+			// This Methode Returns a Bitmap Image Based on Buffer Elements
 
+			Bitmap bitmap = new Bitmap(Width, Height);
+
+			//Type MinValue = 0;
+
+			for(int i=0; i<Width; ++i)
+			{
+				for(int j=0; j<Height; ++j)
+				{
+					//bitmap.SetPixel(i, j, GetDefaultColor(_buffer[x, y]));
+				}
+			}
+
+			return bitmap;
+		}
+
+		public void Iteration()
+		{
+			// This Methode Performs one Iteration of Physical Calculations
+
+
+
+
+		}
 	}
 }
