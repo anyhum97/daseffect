@@ -385,7 +385,7 @@ namespace Simple_2D_Landscape.LandscapeEngine
 			ReCount = true;
 		}
 
-		public void IterationOptimazed()
+		public void Iteration()
 		{
 			// This Methode Performs one Iteration of Physical Calculations
 			
@@ -395,13 +395,15 @@ namespace Simple_2D_Landscape.LandscapeEngine
 			/////////////////////////////********Original Physical Model********////////////////////////////
 
 			// Uses the Wave Equation in a Nonlinear Physical Environment.
-			// Nonlinear Physical Environment is Emulated by Random Numbers.
+			// Nonlinear Physical Environment is Emulated by Random Numbers*.
 
 			// 1. Let u = u(x, y, t);
 			// It Means function u Depends of 3 Variables x, y and t.
 
 			// Wave Equation:
-			// laplacian(u) = d^2(u)/dt^2;
+			// d^2(u)/dt^2 = velocity*laplacian(u);
+
+			// Where 'velocity' is a Phase Speed;
 
 			// laplacian Definition:
 			// laplacian(u) = d^2(u)/dx^2 + d^2(u)/dy^2 in point (x, y, z);
@@ -411,26 +413,79 @@ namespace Simple_2D_Landscape.LandscapeEngine
 			// d^2(u(x, y, t))/dy^2 = u(x, y+1, t) - 2*u(x, y, t) + u(x, y-1, t);
 			// d^2(u(x, y, t))/dt^2 = u(x, y, t+1) - 2*u(x, y, t) + u(x, y, t-1);
 
-			// Note: laplacian(u) is not Depend of the Time [t].
+			// Note: laplacian is not Depend of the Time [t].
 
-			// Re Write Wave Equation:
-			// laplacian(u(x, y, t) = d^2(u(x, y, t))/dt^2;
+			// ReWrite Wave Equation:
+			// d^2(u(x, y, t))/dt^2 = velocity*laplacian(u(x, y, t);
 			
-			// u(x+1, y, t) - 2*u(x, y, t) + u(x-1, y, t) + u(x, y+1, t) - 2*u(x, y, t) + u(x, y-1, t) = 
-			// u(x, y, t+1) - 2*u(x, y, t) + u(x, y, t-1);
+			// u(x, y, t+1) - 2*u(x, y, t) + u(x, y, t-1) = velocity*laplacian;
 
-			// Combine Together:
-			// u(x, y, t+1) = 
-			// u(x+1, y, t) + u(x-1, y, t) + u(x, y+1, t) + u(x, y-1, t) - 2*u(x, y, t) - u(x, y, t-1);
+			// u(x+1, y, t) = velocity*laplacian + 2*u(x, y, t) - u(x, y, t-1);
 
-			// If We Know u(t-1) State and u(t) State We Can Say what will be u(t+1) [Future State].
+			// If We Know u(t-1) and u(t) States, That Means We Can Calculate u(t+1) State [Future State].
 
 			// Now We have Classical Solution of Wave Equation.
 			// If We will Update Less Than 100% Points We Will Have an Interesting Picture...
 
 			////////////////////////////////////////////////////////////////////////////////////////////////
 
-			const float velocity = 0.20f;	// Phase Speed;
+			const float velocity = 0.50f;	// Phase Speed;
+
+			_bufferMinValue = float.MaxValue;
+			_bufferMaxValue = float.MinValue;
+
+			_bufferSum = 0.0f;
+
+			for(int i=0; i<Width; ++i)
+			{
+				for(int j=0; j<Height; ++j)
+				{
+					// Make Calculation for Internal Points:
+					
+					if(IsHappened())
+					{
+						float laplacian =  Get(1, i+1, j) + 
+										   Get(1, i-1, j) + 
+										   Get(1, i, j+1) + 
+										   Get(1, i, j-1) - 4.0f * 
+										   Get(1, i, j);
+
+						Buffer[2][i][j] = 2.0f*Buffer[1][i][j] - Buffer[0][i][j] + velocity*laplacian;
+					}
+					else
+					{
+						Buffer[2][i][j] = Buffer[1][i][j];	// Point Was Not Updated;
+					}
+
+					_bufferMinValue = Math.Min(_bufferMinValue, Buffer[2][i][j]);
+					_bufferMaxValue = Math.Max(_bufferMaxValue, Buffer[2][i][j]);
+
+					_bufferSum += Buffer[2][i][j];
+				}
+			}
+
+			// Push Buffers:
+
+			float[][] link = Buffer[0];
+
+			Buffer[0] = Buffer[1];
+			Buffer[1] = Buffer[2];
+			
+			Buffer[2] = link;
+
+			ReCount = false;
+		}
+
+		public void IterationOptimazed()
+		{
+			// This Methode Performs one Iteration of Physical Calculations
+			
+			if(!IsValid())
+				return;
+
+			////////////////////////////////////////////////////////////////////////////////////////////////
+
+			const float velocity = 0.50f;	// Phase Speed;
 
 			// Cycle Optimization Picture:
 
@@ -633,98 +688,6 @@ namespace Simple_2D_Landscape.LandscapeEngine
 										   Buffer[1][i][j+1] + 
 										   Buffer[1][i][j-1] - 4.0f * 
 										   Buffer[1][i][j];
-
-						Buffer[2][i][j] = 2.0f*Buffer[1][i][j] - Buffer[0][i][j] + velocity*laplacian;
-					}
-					else
-					{
-						Buffer[2][i][j] = Buffer[1][i][j];	// Point Was Not Updated;
-					}
-
-					_bufferMinValue = Math.Min(_bufferMinValue, Buffer[2][i][j]);
-					_bufferMaxValue = Math.Max(_bufferMaxValue, Buffer[2][i][j]);
-
-					_bufferSum += Buffer[2][i][j];
-				}
-			}
-
-			// Push Buffers:
-
-			float[][] link = Buffer[0];
-
-			Buffer[0] = Buffer[1];
-			Buffer[1] = Buffer[2];
-			
-			Buffer[2] = link;
-
-			ReCount = false;
-		}
-
-		public void Iteration()
-		{
-			// This Methode Performs one Iteration of Physical Calculations
-			
-			if(!IsValid())
-				return;
-			
-			/////////////////////////////********Original Physical Model********////////////////////////////
-
-			// Uses the Wave Equation in a Nonlinear Physical Environment.
-			// Nonlinear Physical Environment is Emulated by Random Numbers.
-
-			// 1. Let u = u(x, y, t);
-			// It Means function u Depends of 3 Variables x, y and t.
-
-			// Wave Equation:
-			// laplacian(u) = d^2(u)/dt^2;
-
-			// laplacian Definition:
-			// laplacian(u) = d^2(u)/dx^2 + d^2(u)/dy^2 in point (x, y, z);
-
-			// Second Derivative Definition:
-			// d^2(u(x, y, t))/dx^2 = u(x+1, y, t) - 2*u(x, y, t) + u(x-1, y, t);
-			// d^2(u(x, y, t))/dy^2 = u(x, y+1, t) - 2*u(x, y, t) + u(x, y-1, t);
-			// d^2(u(x, y, t))/dt^2 = u(x, y, t+1) - 2*u(x, y, t) + u(x, y, t-1);
-
-			// Note: laplacian(u) is not Depend of the Time [t].
-
-			// Re Write Wave Equation:
-			// laplacian(u(x, y, t) = d^2(u(x, y, t))/dt^2;
-			
-			// u(x+1, y, t) - 2*u(x, y, t) + u(x-1, y, t) + u(x, y+1, t) - 2*u(x, y, t) + u(x, y-1, t) = 
-			// u(x, y, t+1) - 2*u(x, y, t) + u(x, y, t-1);
-
-			// Combine Together:
-			// u(x, y, t+1) = 
-			// u(x+1, y, t) + u(x-1, y, t) + u(x, y+1, t) + u(x, y-1, t) - 2*u(x, y, t) - u(x, y, t-1);
-
-			// If We Know u(t-1) State and u(t) State We Can Say what will be u(t+1) [Future State].
-
-			// Now We have Classical Solution of Wave Equation.
-			// If We will Update Less Than 100% Points We Will Have an Interesting Picture...
-
-			////////////////////////////////////////////////////////////////////////////////////////////////
-
-			const float velocity = 0.50f;	// Phase Speed;
-
-			_bufferMinValue = float.MaxValue;
-			_bufferMaxValue = float.MinValue;
-
-			_bufferSum = 0.0f;
-
-			for(int i=0; i<Width; ++i)
-			{
-				for(int j=0; j<Height; ++j)
-				{
-					// Make Calculation for Internal Points:
-					
-					if(IsHappened())
-					{
-						float laplacian =  Get(1, i+1, j) + 
-										   Get(1, i-1, j) + 
-										   Get(1, i, j+1) + 
-										   Get(1, i, j-1) - 4.0f * 
-										   Get(1, i, j);
 
 						Buffer[2][i][j] = 2.0f*Buffer[1][i][j] - Buffer[0][i][j] + velocity*laplacian;
 					}
