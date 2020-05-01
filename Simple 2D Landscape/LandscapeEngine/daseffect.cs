@@ -39,7 +39,8 @@ namespace Simple_2D_Landscape.LandscapeEngine
 		public enum ColorInterpretatorType
 		{
 			Default,
-			Boolean
+			Boolean,
+			Landscape,
 		}
 
 		public ColorInterpretatorType CurrentColorInterpretator { get; set; } = default;
@@ -82,7 +83,9 @@ namespace Simple_2D_Landscape.LandscapeEngine
 		{
 			_colorInterpretators = new ColorInterpretator[]
 			{
-				GetDefaultColor
+				GetDefaultColor,
+				GetBooleanColor,
+				GetLandscapeColor
 			};
 		}
 
@@ -156,6 +159,69 @@ namespace Simple_2D_Landscape.LandscapeEngine
 				int intensity = (int)(Math.Floor(255.0f-255.0f * value / MaxValue));
 				return Color.FromArgb(intensity, intensity, intensity);
 			}
+		}
+		
+		private static Color GetBooleanColor(float value, float MinValue, float MaxValue)
+		{
+			// This Method Returns Color Based on Input Value
+
+			if(value == 0.0f)
+			{
+				return Color.White;
+			}
+
+			if(value < 0.0f)
+			{
+				return Color.Blue;
+			}
+
+			return Color.Black;
+		}
+
+		private static Color GetLandscapeColor(float value, float MinValue, float MaxValue)
+		{
+			// This Method Returns Color Based on Input Value
+
+			value = value - MinValue;
+
+			float factor = MaxValue - MinValue;
+
+			if(value < 0.12*factor)
+			{
+				return Color.FromArgb(6, 0, 47);
+			}
+
+			if(value < 0.25*factor)
+			{
+				return Color.FromArgb(23, 0, 187);
+			}
+
+			if(value < 0.33*factor)
+			{
+				return Color.FromArgb(119, 100, 255);
+			}
+
+			if(value < 0.5*factor)
+			{
+				return Color.FromArgb(119, 100, 255);
+			}
+
+			if(value < 0.65*factor)
+			{
+				return Color.FromArgb(243, 188, 73);
+			}
+
+			if(value < 0.80*factor)
+			{
+				return Color.FromArgb(28, 231, 12);
+			}
+
+			if(value < 0.85*factor)
+			{
+				return Color.FromArgb(32, 210, 180);
+			}
+
+			return Color.White;
 		}
 		
 		private Color GetColor(float value)
@@ -338,7 +404,7 @@ namespace Simple_2D_Landscape.LandscapeEngine
 			{
 				for(int j=0; j<Height; ++j)
 				{
-					bitmap.SetPixel(i, j, GetDefaultColor(Buffer[dim][i][j], _bufferMinValue, _bufferMaxValue));
+					bitmap.SetPixel(i, j, GetColor(Buffer[dim][i][j]));
 				}
 			}
 
@@ -349,7 +415,6 @@ namespace Simple_2D_Landscape.LandscapeEngine
 
 		/// <summary>
 		/// Adds Random Noise (Using Random Seed)
-		/// 
 		/// </summary>
 		/// <param name="amplitude"></param>
 		/// <param name="freq"></param>
@@ -429,7 +494,7 @@ namespace Simple_2D_Landscape.LandscapeEngine
 
 			////////////////////////////////////////////////////////////////////////////////////////////////
 
-			const float velocity = 0.50f;	// Phase Speed;
+			const float velocity = 0.40f;	// Phase Speed;
 
 			_bufferMinValue = float.MaxValue;
 			_bufferMaxValue = float.MinValue;
