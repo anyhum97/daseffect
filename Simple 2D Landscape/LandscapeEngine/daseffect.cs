@@ -16,14 +16,9 @@ namespace Simple_2D_Landscape.LandscapeEngine
 
 		private static readonly ColorInterpretator[] _colorInterpretators;
 
-		/// <summary>
-		/// Shows What Percentage of Points Should be Recalculated.
-		/// MinValue => MinCorruptionRate;
-		/// MaxValue => MaxCorruptionRate;
-		/// </summary>
-		private double _corruptionRate = 0.95f;
+		private Random _random;
 
-		private Random _random = new Random();
+		private double _corruptionRate;
 
 		private float _bufferMinValue;
 		private float _bufferMaxValue;
@@ -46,11 +41,18 @@ namespace Simple_2D_Landscape.LandscapeEngine
 			Boolean
 		}
 
-		public ColorInterpretatorType _currentColorInterpretator { get; set; } = default;
+		public ColorInterpretatorType CurrentColorInterpretator { get; set; } = default;
 		
-		public const double MinCorruptionRate = 0.005;
-		public const double MaxCorruptionRate = 0.995;
+		public const double DefaultCorruptionRate = 1.000;
+		
+		public const double MinCorruptionRate = 0.001;
+		public const double MaxCorruptionRate = 1.000;
 
+		/// <summary>
+		/// Shows What Percentage of Points Should be Recalculated.
+		/// MinValue => MinCorruptionRate;
+		/// MaxValue => MaxCorruptionRate;
+		/// </summary>
 		public double CorruptionRate
 		{
 			get
@@ -90,7 +92,8 @@ namespace Simple_2D_Landscape.LandscapeEngine
 
 		public daseffect(int width, int height, int seed = 0, double corruptionRate = 0.95)
 		{
-			// Min Field is 3x3
+			// Minimus Buffer Size is [3][3][3];
+
 			if(width < 3 || height < 3)
 			{
 				Clear();
@@ -108,7 +111,7 @@ namespace Simple_2D_Landscape.LandscapeEngine
 
 			for(int i=0; i<3; ++i)
 			{
-				// Allocate Width x Height Field;
+				// Allocate [Width] x [Height] Field;
 
 				_buffer[i] = new float[width][];
 
@@ -185,10 +188,10 @@ namespace Simple_2D_Landscape.LandscapeEngine
 		
 		private Color GetColor(float value)
 		{
-			return _colorInterpretators[(int)_currentColorInterpretator](value, _bufferMinValue, _bufferMaxValue);
+			return _colorInterpretators[(int)CurrentColorInterpretator](value, _bufferMinValue, _bufferMaxValue);
 		}
 
-		private void Count()
+		private void Count(int dim = 1)
 		{
 			if(ReCount)
 			{
@@ -199,7 +202,7 @@ namespace Simple_2D_Landscape.LandscapeEngine
 				{
 					for(int j=0; j<Height; ++j)
 					{
-						float value = _buffer[2][i][j];
+						float value = _buffer[dim][i][j];
 
 						if(value < _bufferMinValue)
 						{
@@ -234,6 +237,15 @@ namespace Simple_2D_Landscape.LandscapeEngine
 				return false;
 			}
 
+			try
+			{
+				float value = _buffer[2][Width-1][Height-1];
+			}
+			catch
+			{
+				return false;
+			}
+
 			return true;
 		}
 
@@ -241,11 +253,14 @@ namespace Simple_2D_Landscape.LandscapeEngine
 		{
 			_buffer = null;
 
-			_currentColorInterpretator = default;
-
 			_bufferMinValue = default;
 			_bufferMaxValue = default;
-			
+
+			_random = new Random();
+
+			CurrentColorInterpretator = default;
+			CorruptionRate = DefaultCorruptionRate;
+
 			ReCount = true;
 			Ready = false;
 
@@ -305,7 +320,7 @@ namespace Simple_2D_Landscape.LandscapeEngine
 			_buffer[dim][x][y] = value;
 		}
 
-		public Bitmap GetBitmap(int dim = 2)
+		public Bitmap GetBitmap(int dim = 1)
 		{
 			// This Methode Returns a Bitmap Image Based on Buffer Elements
 
@@ -326,6 +341,8 @@ namespace Simple_2D_Landscape.LandscapeEngine
 				}
 			}
 
+			GC.Collect();
+
 			return bitmap;
 		}
 
@@ -338,7 +355,7 @@ namespace Simple_2D_Landscape.LandscapeEngine
 				return;
 			}
 
-			// Original Physical Model:
+			//********Original Physical Model********
 
 			// Uses the Wave Equation in a Nonlinear Physical Environment.
 			// Nonlinear Physical Environment is Emulated by Random Numbers.
@@ -374,25 +391,48 @@ namespace Simple_2D_Landscape.LandscapeEngine
 			// Now We have Classical Solution of Wave Equation.
 			// If We will Update Less Than 100% Points We Will Have an Interesting Picture...
 
+			_bufferMinValue = float.MaxValue;
+			_bufferMaxValue = float.MinValue;
+
 			for(int x=0; x<Width; ++x)
 			{
 				for(int y=0; y<Height; ++y)
 				{
-					if(_random.NextDouble() <= CorruptionRate)
+					if(_random.NextDouble() <= CorruptionRate || true)
 					{
+						// Get(0, x, y) => t-1  => past;
+						// Get(1, x, y) => t    => now;
+						// Get(2, x, y) => t+1  => future;
+
 						float laplacian = Get(1, x + 1, y) +
 										  Get(1, x - 1, y) +
 										  Get(1, x, y + 1) +
 										  Get(1, x, y - 1) - 4.0f *
 										  Get(1, x, y);
 
+						float futureState = 1.1f*laplacian + Get(1, x, y) - Get(0, x, y);
+
+						if(futureState < _bufferMinValue)
+							_bufferMinValue = futureState;
+
+						if(futureState > _bufferMaxValue)
+							_bufferMaxValue = futureState;
+
+						_buffer[2][x][y] = futureState;
 					}
 				}
 			}
 
+			// Push Buffers
+
+			float[][] link = _buffer[0];
+
+			_buffer[0] = _buffer[1];
+			_buffer[1] = _buffer[2];
 			
+			_buffer[2] = link;
 
-
+			ReCount = true;
 		}
 	}
 }
