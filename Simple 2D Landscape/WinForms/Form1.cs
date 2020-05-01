@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Linq;
@@ -16,16 +17,17 @@ namespace Simple_2D_Landscape
 	public partial class Form1 : Form
 	{
         private static daseffect _test;
+
         private Timer _timer;
 
-        private void SetPicture(Bitmap input)
+        private void SetPicture(Bitmap input, bool Scale = true)
         {
             int Width = pictureBox1.Width;
             int Height = pictureBox1.Height;
 
             Bitmap image = input;
 
-            if(input.Width != Width || input.Height != Height)
+            if(Scale && (input.Width != Width || input.Height != Height))
             {
                 image = new Bitmap(Width, Height);
 
@@ -46,19 +48,31 @@ namespace Simple_2D_Landscape
 			InitializeComponent();
 
             _test = new daseffect(256, 256);
+            
+            _test.AddNoise(0.1f, 0.45f);
+
+            _test.Set(0, _test.Width >> 1, _test.Height >> 1, 1.0f);
+            _test.Set(1, _test.Width >> 1, _test.Height >> 1, 1.0f);
+
             SetPicture(_test.GetBitmap());
 
             _timer = new Timer();
-            _timer.Interval = 10;
-            _timer.Enabled = true;
+            _timer.Interval = 25;
+            _timer.Enabled = false;
 
-            _timer.Tick += new EventHandler(TimerEventProcessor);
+            _timer.Tick += new EventHandler(CalcTimerProcessor);
 		}
 
-        private void TimerEventProcessor(Object myObject, EventArgs myEventArgs)
+        private void CalcTimerProcessor(Object myObject, EventArgs myEventArgs)
         {
-            _test.Iteration();
+            Stopwatch sw = new Stopwatch();
+
+            sw.Start();
+            _test.IterationOptimazed();
             SetPicture(_test.GetBitmap());
+            sw.Stop();
+            
+            long calcTime = sw.ElapsedMilliseconds;
         }
 
         private void openGLControl1_OpenGLDraw_1(object sender, RenderEventArgs args)
