@@ -45,7 +45,7 @@ namespace Simple_2D_Landscape.LandscapeEngine
 
 		public ColorInterpretatorType CurrentColorInterpretator { get; set; } = default;
 		
-		public const double DefaultCorruptionRate = 0.980;
+		public const double DefaultCorruptionRate = 0.95;
 		
 		public const double MinCorruptionRate = 0.001;
 		public const double MaxCorruptionRate = 1.000;
@@ -418,7 +418,7 @@ namespace Simple_2D_Landscape.LandscapeEngine
 		/// </summary>
 		/// <param name="amplitude"></param>
 		/// <param name="freq"></param>
-		public void AddNoise(float amplitude, float freq)
+		public void AddNoise(float minValue, float maxValue, float freq)
 		{
 			if(!IsValid())
 				return;
@@ -435,15 +435,43 @@ namespace Simple_2D_Landscape.LandscapeEngine
 				{
 					if(_random.NextDouble() <= freq)
 					{
-						float value = amplitude*(float)(0.5-_random.NextDouble());
+						float value = minValue + (maxValue-minValue)*(float)(_random.NextDouble());
+						
+						Buffer[0][i][j] = value;
+					}
+
+					if(_random.NextDouble() <= freq)
+					{
+						float value = minValue + (maxValue-minValue)*(float)(_random.NextDouble());
+						
+						Buffer[1][i][j] = value;
+					}
+				}
+			}
+
+			ReCount = true;
+		}
+		
+		public void AddNoise(float value, float freq)
+		{
+			if(!IsValid())
+				return;
+
+			if(freq > 1.0f)
+				freq = 1.0f;
+
+			if(freq <= 0.0f)
+				return;
+
+			for(int i=0; i<Width; ++i)
+			{
+				for(int j=0; j<Height; ++j)
+				{
+					if(_random.NextDouble() <= freq)
+					{
 						Buffer[0][i][j] = value;
 						Buffer[1][i][j] = value;
 					}
-
-					//if(_random.NextDouble() <= freq)
-					//{
-					//	Buffer[1][i][j] = amplitude*(float)(0.5-_random.NextDouble());
-					//}
 				}
 			}
 
@@ -494,7 +522,7 @@ namespace Simple_2D_Landscape.LandscapeEngine
 
 			////////////////////////////////////////////////////////////////////////////////////////////////
 
-			const float velocity = 0.40f;	// Phase Speed;
+			const float velocity = 0.50f;	// Phase Speed;
 
 			_bufferMinValue = float.MaxValue;
 			_bufferMaxValue = float.MinValue;
@@ -550,7 +578,7 @@ namespace Simple_2D_Landscape.LandscapeEngine
 
 			////////////////////////////////////////////////////////////////////////////////////////////////
 
-			const float velocity = 0.50f;	// Phase Speed;
+			const float velocity = 0.48f;	// Phase Speed;
 
 			// Cycle Optimization Picture:
 
