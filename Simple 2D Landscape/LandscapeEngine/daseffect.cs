@@ -15,11 +15,8 @@ namespace Simple_2D_Landscape.LandscapeEngine
 		private delegate Color ColorInterpretator(float value, float MinValue, float MaxValue);
 
 		private static readonly ColorInterpretator[] _colorInterpretators;
-		public enum ColorInterpretatorType
-		{
-			Default,
-			Boolean
-		}
+
+		private double _corruptionRate = 0.05f;
 
 		private Random _random = new Random();
 
@@ -30,8 +27,36 @@ namespace Simple_2D_Landscape.LandscapeEngine
 
 		private bool Ready { get; set; }
 
+		public enum ColorInterpretatorType
+		{
+			Default,
+			Boolean
+		}
+
 		public ColorInterpretatorType _currentColorInterpretator { get; set; } = default;
 		
+		public const double MinCorruptionRate = 0.005;
+		public const double MaxCorruptionRate = 0.995;
+
+		public double CorruptionRate
+		{
+			get
+			{
+				return _corruptionRate;
+			}
+			
+			set
+			{
+				_corruptionRate = value;
+
+				if(_corruptionRate < MinCorruptionRate)
+					_corruptionRate = MinCorruptionRate;
+
+				if(_corruptionRate > MaxCorruptionRate)
+					_corruptionRate = MaxCorruptionRate;
+			}
+		}
+
 		public int RandomSeed { get; private set; }
 
 		public int Width { get; private set; }
@@ -270,6 +295,27 @@ namespace Simple_2D_Landscape.LandscapeEngine
 			if(!IsValid())
 			{
 				return;
+			}
+
+			// Original Physical Model:
+
+			// Uses the Wave Equation in a Nonequilibrium Medium.
+			// Nonequilibrium Medium is Emulated by Random Numbers.
+
+			for(int x=0; x<Width; ++x)
+			{
+				for(int y=0; y<Height; ++y)
+				{
+					if(_random.NextDouble() > CorruptionRate)
+					{
+						float laplacian = Get(x+1, y) + 
+										  Get(x-1, y) + 
+										  Get(x, y+1) + 
+										  Get(x, y-1) - 4.0f * 
+										  Get(x, y);
+
+					}
+				}
 			}
 
 			
