@@ -8,17 +8,25 @@ using System.Windows.Forms;
 
 namespace Simple_2D_Landscape.LandscapeEngine
 {
-	public class daseffect
+	public interface IBitmapable
+	{
+		Bitmap GetBitmap();
+	}
+
+	public interface ITexturable
+	{
+		
+	}
+
+	public class daseffect : ColorCollection, IBitmapable, ITexturable
 	{
 		private float[][][] Buffer { get; set; }	// [Dimensions][Width][Height];
-
-		private delegate Color ColorInterpretator(float value, float MinValue, float MaxValue);
-
-		private static readonly ColorInterpretator[] _colorInterpretators;
 
 		private Random _random;
 
 		private double _corruptionRate;
+
+		private float _waterLevel;
 
 		private float _bufferMinValue;
 		private float _bufferMaxValue;
@@ -35,15 +43,6 @@ namespace Simple_2D_Landscape.LandscapeEngine
 		/// And Ready to Work.
 		/// </summary>
 		private bool Ready { get; set; }
-
-		public enum ColorInterpretatorType
-		{
-			Default,
-			Boolean,
-			Landscape,
-		}
-
-		public ColorInterpretatorType CurrentColorInterpretator { get; set; } = default;
 		
 		public const double DefaultCorruptionRate = 0.95;
 		
@@ -74,27 +73,43 @@ namespace Simple_2D_Landscape.LandscapeEngine
 			}
 		}
 
+		public const float DefaultWaterLevel = 0.5f;
+		
+		public const float MinWaterLevel = 0.01f;
+		public const float MaxWaterLevel = 0.99f;
+
+		public float WaterLevel
+		{
+			get
+			{
+				return _waterLevel;
+			}
+			
+			set
+			{
+				_waterLevel = value;
+
+				if(_waterLevel < MinWaterLevel)
+					_waterLevel = MinWaterLevel;
+
+				if(_waterLevel > MaxWaterLevel)
+					_waterLevel = MaxWaterLevel;
+			}
+		}
+
 		public int RandomSeed { get; private set; }
 
 		public int Width { get; private set; }
 		public int Height { get; private set; }
-
-		static daseffect()
-		{
-			_colorInterpretators = new ColorInterpretator[]
-			{
-				GetDefaultColor,
-				GetBooleanColor,
-				GetLandscapeColor
-			};
-		}
 
 		public daseffect()
 		{
 			Clear();
 		}
 
-		public daseffect(int width, int height, int seed = 0, double corruptionRate = DefaultCorruptionRate)
+		public daseffect(int width, int height, int seed = 0, 
+			             double corruptionRate = DefaultCorruptionRate, 
+						 ColorInterpretationType colorInterpretator = ColorInterpretationType.Default)
 		{
 			// Minimus Buffer Size is [3][3][3];
 
@@ -127,8 +142,11 @@ namespace Simple_2D_Landscape.LandscapeEngine
 
 			// We Can Use Seed to Fix the Result
 			_random = new Random(seed);
+			
+			CurrentColorInterpretator = colorInterpretator;
 
 			CorruptionRate = corruptionRate;
+			WaterLevel = DefaultWaterLevel;
 
 			_bufferMinValue = default;
 			_bufferMaxValue = default;
@@ -138,95 +156,6 @@ namespace Simple_2D_Landscape.LandscapeEngine
 
 			ReCount = true;
 			Ready = true;
-		}
-
-		private static Color GetDefaultColor(float value, float MinValue, float MaxValue)
-		{
-			// This Method Returns Color Based on Input Value
-
-			if(value == 0.0f)
-			{
-				return Color.White;
-			}
-
-			if(value < 0.0f)
-			{
-				int intensity = (int)(Math.Floor(255.0f * value / MinValue));
-				return Color.FromArgb(0, 0, intensity);
-			}
-			else
-			{
-				int intensity = (int)(Math.Floor(255.0f-255.0f * value / MaxValue));
-				return Color.FromArgb(intensity, intensity, intensity);
-			}
-		}
-		
-		private static Color GetBooleanColor(float value, float MinValue, float MaxValue)
-		{
-			// This Method Returns Color Based on Input Value
-
-			if(value == 0.0f)
-			{
-				return Color.White;
-			}
-
-			if(value < 0.0f)
-			{
-				return Color.Blue;
-			}
-
-			return Color.Black;
-		}
-
-		private static Color GetLandscapeColor(float value, float MinValue, float MaxValue)
-		{
-			// This Method Returns Color Based on Input Value
-
-			value = value - MinValue;
-
-			float factor = MaxValue - MinValue;
-
-			if(value < 0.12*factor)
-			{
-				return Color.FromArgb(6, 0, 47);
-			}
-
-			if(value < 0.25*factor)
-			{
-				return Color.FromArgb(23, 0, 187);
-			}
-
-			if(value < 0.33*factor)
-			{
-				return Color.FromArgb(119, 100, 255);
-			}
-
-			if(value < 0.5*factor)
-			{
-				return Color.FromArgb(119, 100, 255);
-			}
-
-			if(value < 0.65*factor)
-			{
-				return Color.FromArgb(243, 188, 73);
-			}
-
-			if(value < 0.80*factor)
-			{
-				return Color.FromArgb(28, 231, 12);
-			}
-
-			if(value < 0.85*factor)
-			{
-				return Color.FromArgb(32, 210, 180);
-			}
-
-			return Color.White;
-		}
-		
-		private Color GetColor(float value)
-		{
-			return _colorInterpretators[(int)CurrentColorInterpretator](value, _bufferMinValue, _bufferMaxValue);
 		}
 
 		private static int CoordinateConvertor(int value, int border)
@@ -328,7 +257,9 @@ namespace Simple_2D_Landscape.LandscapeEngine
 			_random = new Random();
 
 			CurrentColorInterpretator = default;
+
 			CorruptionRate = DefaultCorruptionRate;
+			WaterLevel = DefaultWaterLevel;
 
 			ReCount = true;
 			Ready = false;
@@ -389,12 +320,14 @@ namespace Simple_2D_Landscape.LandscapeEngine
 			Buffer[dim][x][y] = value;
 		}
 
-		public Bitmap GetBitmap(int dim = 1)
+		public Bitmap GetBitmap()
 		{
 			// This Methode Returns a Bitmap Image Based on Buffer Elements
 
 			if(!IsValid())
 				return null;
+
+			int dim = 1;
 
 			Bitmap bitmap = new Bitmap(Width, Height);
 
@@ -404,7 +337,7 @@ namespace Simple_2D_Landscape.LandscapeEngine
 			{
 				for(int j=0; j<Height; ++j)
 				{
-					bitmap.SetPixel(i, j, GetColor(Buffer[dim][i][j]));
+					bitmap.SetPixel(i, j, GetColor(Buffer[dim][i][j], _bufferMinValue, _bufferMaxValue, WaterLevel));
 				}
 			}
 

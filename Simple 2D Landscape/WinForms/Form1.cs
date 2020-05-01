@@ -47,8 +47,8 @@ namespace Simple_2D_Landscape
 		{
 			InitializeComponent();
 
-            _test = new daseffect(256, 256);
-            _test.CurrentColorInterpretator = daseffect.ColorInterpretatorType.Landscape;
+            _test = new daseffect(256, 256, colorInterpretator: ColorInterpretationType.WaterFlow);
+            //_test.CurrentColorInterpretator = ColorInterpretationType.Landscape;
 
             _test.AddNoise(0.0001f, 0.001f, 0.01f);
             _test.AddNoise(0.5f, 1.0f, 0.001f);
