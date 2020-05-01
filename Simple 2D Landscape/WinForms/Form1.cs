@@ -49,10 +49,13 @@ namespace Simple_2D_Landscape
 
             _test = new daseffect(256, 256);
             
-            _test.AddNoise(0.1f, 0.45f);
+            //_test.AddNoise(0.001f, 0.45f);
 
             _test.Set(0, _test.Width >> 1, _test.Height >> 1, 1.0f);
-            _test.Set(1, _test.Width >> 1, _test.Height >> 1, 1.0f);
+            _test.Set(1, _test.Width >> 1, _test.Height >> 1, -1.0f);
+
+            _test.Set(0, 10, 25, 1.0f);
+            _test.Set(1, 10, 25, -1.0f);
 
             SetPicture(_test.GetBitmap());
 

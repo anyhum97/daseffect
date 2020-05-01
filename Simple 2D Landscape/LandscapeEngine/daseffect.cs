@@ -44,7 +44,7 @@ namespace Simple_2D_Landscape.LandscapeEngine
 
 		public ColorInterpretatorType CurrentColorInterpretator { get; set; } = default;
 		
-		public const double DefaultCorruptionRate = 0.900;
+		public const double DefaultCorruptionRate = 0.980;
 		
 		public const double MinCorruptionRate = 0.001;
 		public const double MaxCorruptionRate = 1.000;
@@ -347,6 +347,12 @@ namespace Simple_2D_Landscape.LandscapeEngine
 			return bitmap;
 		}
 
+		/// <summary>
+		/// Adds Random Noise (Using Random Seed)
+		/// 
+		/// </summary>
+		/// <param name="amplitude"></param>
+		/// <param name="freq"></param>
 		public void AddNoise(float amplitude, float freq)
 		{
 			if(!IsValid())
@@ -364,15 +370,19 @@ namespace Simple_2D_Landscape.LandscapeEngine
 				{
 					if(_random.NextDouble() <= freq)
 					{
-						Buffer[0][i][j] = amplitude*(float)_random.NextDouble();
+						float value = amplitude*(float)(0.5-_random.NextDouble());
+						Buffer[0][i][j] = value;
+						Buffer[1][i][j] = value;
 					}
 
-					if(_random.NextDouble() <= freq)
-					{
-						Buffer[1][i][j] = amplitude*(float)_random.NextDouble();
-					}
+					//if(_random.NextDouble() <= freq)
+					//{
+					//	Buffer[1][i][j] = amplitude*(float)(0.5-_random.NextDouble());
+					//}
 				}
 			}
+
+			ReCount = true;
 		}
 
 		public void IterationOptimazed()
@@ -420,7 +430,7 @@ namespace Simple_2D_Landscape.LandscapeEngine
 
 			////////////////////////////////////////////////////////////////////////////////////////////////
 
-			const float velocity = 0.50f;	// Phase Speed;
+			const float velocity = 0.20f;	// Phase Speed;
 
 			// Cycle Optimization Picture:
 
