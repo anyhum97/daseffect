@@ -410,7 +410,7 @@ namespace Simple_2D_Landscape.LandscapeEngine
 										  Get(1, x, y - 1) - 4.0f *
 										  Get(1, x, y);
 
-						float futureState = 1.1f*laplacian + Get(1, x, y) - Get(0, x, y);
+						float futureState = 0.5f*laplacian + 2.0f*Get(1, x, y) - Get(0, x, y);
 
 						if(futureState < _bufferMinValue)
 							_bufferMinValue = futureState;

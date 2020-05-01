@@ -49,7 +49,7 @@ namespace Simple_2D_Landscape
             SetPicture(_test.GetBitmap());
 
             _timer = new Timer();
-            _timer.Interval = 100;
+            _timer.Interval = 10;
             _timer.Enabled = true;
 
             _timer.Tick += new EventHandler(TimerEventProcessor);
@@ -94,8 +94,7 @@ namespace Simple_2D_Landscape
 
         private void pictureBox1_Click(object sender, EventArgs e)
         {
-            _test.Iteration();
-            SetPicture(_test.GetBitmap());
+            _timer.Enabled = !_timer.Enabled;
         }
     }
 }
