@@ -20,7 +20,7 @@ namespace Simple_2D_Landscape
 		{
 			InitializeComponent();
 
-            test = new daseffect(256, 256);
+            test = new daseffect(128, 256);
             pictureBox1.Image = test.GetBitmap();
 		}
 

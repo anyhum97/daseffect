@@ -10,21 +10,34 @@ namespace Simple_2D_Landscape.LandscapeEngine
 {
 	public class daseffect
 	{
-		private float[,] _buffer;
+		private float[][][] _buffer;	// [Dimensions][Width][Height];
 
 		private delegate Color ColorInterpretator(float value, float MinValue, float MaxValue);
 
 		private static readonly ColorInterpretator[] _colorInterpretators;
 
-		private double _corruptionRate = 0.05f;
+		/// <summary>
+		/// Shows What Percentage of Points Should be Recalculated.
+		/// MinValue => MinCorruptionRate;
+		/// MaxValue => MaxCorruptionRate;
+		/// </summary>
+		private double _corruptionRate = 0.95f;
 
 		private Random _random = new Random();
 
 		private float _bufferMinValue;
 		private float _bufferMaxValue;
 
+		/// <summary>
+		/// Shows Should Metrics be Recalculated;
+		/// Metrics: _bufferMinValue, _bufferMaxValue;
+		/// </summary>
 		private bool ReCount { get; set; }
 
+		/// <summary>
+		/// Shows That the Class Instance was Successfully Initialized
+		/// And Ready to Work.
+		/// </summary>
 		private bool Ready { get; set; }
 
 		public enum ColorInterpretatorType
@@ -75,7 +88,7 @@ namespace Simple_2D_Landscape.LandscapeEngine
 			Clear();
 		}
 
-		public daseffect(int width, int height, int Seed = 0)
+		public daseffect(int width, int height, int seed = 0, double corruptionRate = 0.95)
 		{
 			// Min Field is 3x3
 			if(width < 3 || height < 3)
@@ -84,9 +97,31 @@ namespace Simple_2D_Landscape.LandscapeEngine
 				return;
 			}
 
-			_buffer = new float[width, height];
+			_buffer = new float[3][][];
 
-			_random = new Random(Seed);
+			// Note: First Dimension of Buffer is Responsible for Time
+			// We Need Three Time-Shots to Provide Operations with Second Derivative.
+
+			// [0] => t-1	 => past;
+			// [1] => t		 => now;
+			// [2] => t+1	 => future;
+
+			for(int i=0; i<3; ++i)
+			{
+				// Allocate Width x Height Field;
+
+				_buffer[i] = new float[width][];
+
+				for(int j=0; j<width; ++j)
+				{
+					_buffer[i][j] = new float[height];
+				}
+			}
+
+			// We Can Use Seed to Fix the Result
+			_random = new Random(seed);
+
+			CorruptionRate = corruptionRate;
 
 			_bufferMinValue = default;
 			_bufferMaxValue = default;
@@ -97,7 +132,8 @@ namespace Simple_2D_Landscape.LandscapeEngine
 			ReCount = true;
 			Ready = true;
 
-			Set(Width>>1, Height>>1, 1.0f);
+			Set(0, Width>>1, Height>>1, 1.0f);
+			Set(1, Width>>1, Height>>1, 1.0f);
 		}
 
 		private static int CoordinateConvertor(int value, int border)
@@ -163,7 +199,7 @@ namespace Simple_2D_Landscape.LandscapeEngine
 				{
 					for(int j=0; j<Height; ++j)
 					{
-						float value = _buffer[i, j];
+						float value = _buffer[2][i][j];
 
 						if(value < _bufferMinValue)
 						{
@@ -193,11 +229,6 @@ namespace Simple_2D_Landscape.LandscapeEngine
 				return false;
 			}
 
-			if(_buffer.Length < 9)
-			{
-				return false;
-			}
-
 			if(Width < 3 || Height < 3)
 			{
 				return false;
@@ -222,7 +253,7 @@ namespace Simple_2D_Landscape.LandscapeEngine
 			Height = 0;
 		}
 
-		public float Get(int x, int y)
+		public float Get(int dim, int x, int y)
 		{
 			// This Method Allows to Get the Buffer Element
 
@@ -233,6 +264,11 @@ namespace Simple_2D_Landscape.LandscapeEngine
 				throw new Exception("> daseffect: Used Invalid Instance");
 			}
 
+			if(dim >= 3)
+			{
+				throw new ArgumentException();
+			}
+
 			////////////////////////////////////////////////////////////////////////
 
 			x = CoordinateConvertor(x, Width);
@@ -240,10 +276,10 @@ namespace Simple_2D_Landscape.LandscapeEngine
 
 			////////////////////////////////////////////////////////////////////////
 
-			return _buffer[x, y];
+			return _buffer[dim][x][y];
 		}
 
-		public void Set(int x, int y, float value)
+		public void Set(int dim, int x, int y, float value)
 		{
 			// This Method Allows to Set the Buffer Element
 			
@@ -254,6 +290,11 @@ namespace Simple_2D_Landscape.LandscapeEngine
 				throw new Exception("> daseffect: Used Invalid Instance");
 			}
 
+			if(dim >= 3)
+			{
+				throw new ArgumentException();
+			}
+
 			////////////////////////////////////////////////////////////////////////
 
 			x = CoordinateConvertor(x, Width);
@@ -261,10 +302,10 @@ namespace Simple_2D_Landscape.LandscapeEngine
 
 			////////////////////////////////////////////////////////////////////////
 			
-			_buffer[x, y] = value;
+			_buffer[dim][x][y] = value;
 		}
 
-		public Bitmap GetBitmap()
+		public Bitmap GetBitmap(int dim = 2)
 		{
 			// This Methode Returns a Bitmap Image Based on Buffer Elements
 
@@ -281,7 +322,7 @@ namespace Simple_2D_Landscape.LandscapeEngine
 			{
 				for(int j=0; j<Height; ++j)
 				{
-					bitmap.SetPixel(i, j, GetDefaultColor(_buffer[i, j], _bufferMinValue, _bufferMaxValue));
+					bitmap.SetPixel(i, j, GetDefaultColor(_buffer[dim][i][j], _bufferMinValue, _bufferMaxValue));
 				}
 			}
 
@@ -299,20 +340,51 @@ namespace Simple_2D_Landscape.LandscapeEngine
 
 			// Original Physical Model:
 
-			// Uses the Wave Equation in a Nonequilibrium Medium.
-			// Nonequilibrium Medium is Emulated by Random Numbers.
+			// Uses the Wave Equation in a Nonlinear Physical Environment.
+			// Nonlinear Physical Environment is Emulated by Random Numbers.
+
+			// 1. Let u = u(x, y, t);
+			// It Means function u Depends of 3 Variables x, y and t.
+
+			// Wave Equation:
+			// laplacian(u) = d^2(u)/dt^2;
+
+			// laplacian Definition:
+			// laplacian(u) = d^2(u)/dx^2 + d^2(u)/dy^2 in point (x, y, z);
+
+			// Second Derivative Definition:
+			// d^2(u(x, y, t))/dx^2 = u(x+1, y, t) - 2*u(x, y, t) + u(x-1, y, t);
+			// d^2(u(x, y, t))/dy^2 = u(x, y+1, t) - 2*u(x, y, t) + u(x, y-1, t);
+			// d^2(u(x, y, t))/dt^2 = u(x, y, t+1) - 2*u(x, y, t) + u(x, y, t-1);
+
+			// Note: laplacian(u) is not Depend of the Time [t].
+
+			// Re Write Wave Equation:
+			// laplacian(u(x, y, t) = d^2(u(x, y, t))/dt^2;
+			
+			// u(x+1, y, t) - 2*u(x, y, t) + u(x-1, y, t) + u(x, y+1, t) - 2*u(x, y, t) + u(x, y-1, t) = 
+			// u(x, y, t+1) - 2*u(x, y, t) + u(x, y, t-1);
+
+			// Combine Together:
+			// u(x, y, t+1) = 
+			// u(x+1, y, t) + u(x-1, y, t) + u(x, y+1, t) + u(x, y-1, t) - 2*u(x, y, t) - u(x, y, t-1);
+
+			// If We Know u(t-1) State and u(t) State We Can Say what will be u(t+1) [Future State].
+
+			// Now We have Classical Solution of Wave Equation.
+			// If We will Update Less Than 100% Points We Will Have an Interesting Picture...
 
 			for(int x=0; x<Width; ++x)
 			{
 				for(int y=0; y<Height; ++y)
 				{
-					if(_random.NextDouble() > CorruptionRate)
+					if(_random.NextDouble() <= CorruptionRate)
 					{
-						float laplacian = Get(x+1, y) + 
-										  Get(x-1, y) + 
-										  Get(x, y+1) + 
-										  Get(x, y-1) - 4.0f * 
-										  Get(x, y);
+						float laplacian = Get(1, x + 1, y) +
+										  Get(1, x - 1, y) +
+										  Get(1, x, y + 1) +
+										  Get(1, x, y - 1) - 4.0f *
+										  Get(1, x, y);
 
 					}
 				}
