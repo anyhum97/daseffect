@@ -135,9 +135,16 @@ namespace Simple_2D_Landscape.LandscapeEngine
 				}
 			}
 
-			// We Can Use Seed to Fix the Result
-			_random = new Random(seed);
-			
+			if(seed != 0)
+			{
+				// We Can Use Seed to Fix the Result
+				_random = new Random(seed);
+			}
+			else
+			{
+				_random = new Random();
+			}
+
 			CurrentColorInterpretator = colorInterpretator;
 
 			CorruptionRate = corruptionRate;

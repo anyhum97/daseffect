@@ -13,6 +13,7 @@ namespace Simple_2D_Landscape.LandscapeEngine
 		Boolean,
 		Landscape,
 		WaterFlow,
+		Fog
 	}
 
 	public class ColorCollection
@@ -31,6 +32,7 @@ namespace Simple_2D_Landscape.LandscapeEngine
 				GetBooleanColor,
 				GetLandscapeColor,
 				GetWaterFlowColor,
+				GetFogColor,
 			};
 		}
 
@@ -161,6 +163,24 @@ namespace Simple_2D_Landscape.LandscapeEngine
 
 			//return Color.White;
 		}
+
+		private static Color GetFogColor(float value, float MinValue, float MaxValue, float waterLevel)
+		{
+			value = value - MinValue;
+
+			float factor = MaxValue - MinValue;
+			
+			if(factor == 0.0f)
+			{
+				return Color.White;
+			}
+
+			value /= factor;
+
+			return MixColor(Color.FromArgb(45, 45, 84), Color.FromArgb(235, 235, 255), value, 0.0f, 1.0f);
+		}
+
+
 
 
 	}
