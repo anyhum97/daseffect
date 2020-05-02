@@ -16,7 +16,7 @@ daseffect Project:
 </p>
 
 <p>
-<img src="Pictures/FogAnimation.gif" width="256" height="256">
+<!img src="Pictures/FogAnimation.gif" width="256" height="256">
 </p>
   
 anyhum@yandex.ru
