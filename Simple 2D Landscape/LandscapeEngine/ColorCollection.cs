@@ -13,7 +13,8 @@ namespace Simple_2D_Landscape.LandscapeEngine
 		Boolean,
 		Landscape,
 		WaterFlow,
-		Fog
+		Fog,
+		Pie,
 	}
 
 	public class ColorCollection
@@ -33,6 +34,7 @@ namespace Simple_2D_Landscape.LandscapeEngine
 				GetLandscapeColor,
 				GetWaterFlowColor,
 				GetFogColor,
+				GetPieColor,
 			};
 		}
 
@@ -180,8 +182,42 @@ namespace Simple_2D_Landscape.LandscapeEngine
 			return MixColor(Color.FromArgb(45, 45, 84), Color.FromArgb(235, 235, 255), value, 0.0f, 1.0f);
 		}
 
+		private static Color GetPieColor(float value, float MinValue, float MaxValue, float waterLevel)
+		{
+			value = value - MinValue;
 
+			float factor = MaxValue - MinValue;
+			
+			if(factor == 0.0f)
+			{
+				return Color.White;
+			}
 
+			value /= factor;
 
+			value = value + 0.5f - waterLevel;
+
+			if(value < 0.0f)
+			{
+				value = 0.0f;
+			}
+
+			if(value > 1.0f)
+			{
+				value = 1.0f;
+			}
+
+			if(value < 0.5f)
+			{
+				return MixColor(Color.FromArgb(64, 4, 174), Color.FromArgb(11, 152, 206), value, 0.0f, 0.5f);
+			}
+
+			if(value < 0.75f)
+			{
+				return MixColor(Color.FromArgb(254, 232, 29), Color.FromArgb(130, 251, 49), value, 0.50f, 0.75f);
+			}
+
+			return Color.White;
+		}
 	}
 }
