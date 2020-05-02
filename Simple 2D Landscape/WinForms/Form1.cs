@@ -72,6 +72,8 @@ namespace Simple_2D_Landscape
             comboBox1.SelectedItem = _daseffect.CurrentColorInterpretator;
 
             comboBox1.SelectedValueChanged += ComboBox1_SelectedValueChanged;
+
+            textBox1.Text = _daseffect.RandomSeed.ToString();
         }
 
         private void ComboBox1_SelectedValueChanged(object sender, EventArgs e)

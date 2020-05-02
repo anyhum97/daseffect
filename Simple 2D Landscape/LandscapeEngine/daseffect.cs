@@ -39,7 +39,7 @@ namespace Simple_2D_Landscape.LandscapeEngine
 		/// </summary>
 		private bool Ready { get; set; }
 		
-		public const double DefaultCorruptionRate = 0.75;
+		public const double DefaultCorruptionRate = 0.950;
 		
 		public const double MinCorruptionRate = 0.001;
 		public const double MaxCorruptionRate = 1.000;
@@ -135,14 +135,17 @@ namespace Simple_2D_Landscape.LandscapeEngine
 				}
 			}
 
-			if(seed != 0)
+			if(seed == 0)
 			{
-				// We Can Use Seed to Fix the Result
-				_random = new Random(seed);
+				_random = new Random();
+				RandomSeed = _random.Next();
+				_random = new Random(RandomSeed);
 			}
 			else
 			{
-				_random = new Random();
+				// We Can Use Seed to Fix the Result
+				_random = new Random(seed);
+				RandomSeed = seed;				
 			}
 
 			CurrentColorInterpretator = colorInterpretator;
