@@ -3,7 +3,7 @@ daseffect Project:
 <p>
   Generates pseudo-random structures using discrete differential operators.
   <br>
-  Perlin noise is not used.
+  Perlin noise is not used. Fog Animations is Available.
 </p>
 
 <p>
