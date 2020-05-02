@@ -15,4 +15,8 @@ daseffect Project:
   <img src="Pictures/Fog2.png" width="256" height="256">
 </p>
 
+<p>
+<img src="Pictures/Fog animation.gif" width="256" height="256">
+</p>
+  
 anyhum@yandex.ru
