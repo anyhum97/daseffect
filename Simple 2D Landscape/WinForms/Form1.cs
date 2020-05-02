@@ -152,5 +152,16 @@ namespace Simple_2D_Landscape
         {
             _timer.Enabled = !_timer.Enabled;
         }
+
+        private void button7_Click(object sender, EventArgs e)
+        {
+            _daseffect.IterationOptimazed();
+            SetPicture(_daseffect.GetBitmap());
+        }
+
+        private void button8_Click(object sender, EventArgs e)
+        {
+
+        }
     }
 }
