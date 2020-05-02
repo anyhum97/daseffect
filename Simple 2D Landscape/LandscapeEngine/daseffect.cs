@@ -39,7 +39,7 @@ namespace Simple_2D_Landscape.LandscapeEngine
 		/// </summary>
 		private bool Ready { get; set; }
 		
-		public const double DefaultCorruptionRate = 0.75;
+		public const double DefaultCorruptionRate = 0.95;
 		
 		public const double MinCorruptionRate = 0.001;
 		public const double MaxCorruptionRate = 1.000;
@@ -429,18 +429,19 @@ namespace Simple_2D_Landscape.LandscapeEngine
 			// Wave Equation:
 			// d^2(u)/dt^2 = velocity*laplacian(u);
 
-			// Where 'velocity' is a Phase [Wave] Speed;
+			// Where 'velocity' is a Phase Speed;
 
 			// laplacian Definition:
 			// laplacian(u) = d^2(u)/dx^2 + d^2(u)/dy^2 in point (x, y, z);
 
-			// Second Derivatives Definition:
+			// Second Derivative Definition:
 			// d^2(u(x, y, t))/dx^2 = u(x+1, y, t) - 2*u(x, y, t) + u(x-1, y, t);
 			// d^2(u(x, y, t))/dy^2 = u(x, y+1, t) - 2*u(x, y, t) + u(x, y-1, t);
 			// d^2(u(x, y, t))/dt^2 = u(x, y, t+1) - 2*u(x, y, t) + u(x, y, t-1);
-			// For Discrete Step dx = dy = dt = 1;
 
-			// Substitute the Formulas in the Equation:
+			// Note: laplacian is not Depend of the Time [t].
+
+			// ReWrite Wave Equation:
 			// d^2(u(x, y, t))/dt^2 = velocity*laplacian(u(x, y, t);
 			
 			// u(x, y, t+1) - 2*u(x, y, t) + u(x, y, t-1) = velocity*laplacian;
@@ -449,7 +450,7 @@ namespace Simple_2D_Landscape.LandscapeEngine
 
 			// If We Know u(t-1) and u(t) States, That Means We Can Calculate u(t+1) State [Future State].
 
-			// Now We have Classical Solution of the Wave Equation.
+			// Now We have Classical Solution of Wave Equation.
 			// If We will Update Less Than 100% Points We Will Have an Interesting Picture...
 
 			////////////////////////////////////////////////////////////////////////////////////////////////
@@ -465,6 +466,8 @@ namespace Simple_2D_Landscape.LandscapeEngine
 			{
 				for(int j=0; j<Height; ++j)
 				{
+					// Make Calculation for Internal Points:
+					
 					if(IsHappened())
 					{
 						float laplacian =  Get(1, i+1, j) + 
