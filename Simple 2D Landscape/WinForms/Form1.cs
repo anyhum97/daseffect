@@ -117,6 +117,22 @@ namespace Simple_2D_Landscape
             long calcTime = sw.ElapsedMilliseconds;
         }
 
+        private void pictureBox1_Click(object sender, EventArgs e)
+        {
+            _timer.Enabled = !_timer.Enabled;
+        }
+
+        private void button7_Click(object sender, EventArgs e)
+        {
+            _daseffect.IterationOptimazed();
+            SetPicture(_daseffect.GetBitmap());
+        }
+
+        private void button8_Click(object sender, EventArgs e)
+        {
+
+        }
+
         //private void openGLControl1_OpenGLDraw_1(object sender, RenderEventArgs args)
         //{
         //    // Create a Simple Sample:
@@ -147,21 +163,5 @@ namespace Simple_2D_Landscape
         //    // Stop Drawing
         //    gl.End();
         //}
-
-        private void pictureBox1_Click(object sender, EventArgs e)
-        {
-            _timer.Enabled = !_timer.Enabled;
-        }
-
-        private void button7_Click(object sender, EventArgs e)
-        {
-            _daseffect.IterationOptimazed();
-            SetPicture(_daseffect.GetBitmap());
-        }
-
-        private void button8_Click(object sender, EventArgs e)
-        {
-
-        }
     }
 }
