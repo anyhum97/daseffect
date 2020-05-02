@@ -1,7 +1,3 @@
-<style>
-   img { border: 1px solid #ccc; } .fast { image-rendering: pixelated; }
-</style>
-
 daseffect Project:
 <br>
 <p>
@@ -11,7 +7,7 @@ daseffect Project:
 </p>
 
 <p>
-  <img src="Pictures/Landscape1.png" width="256" height="256">
+  <img src="Pictures/Landscape1.png" width="256" height="256" image-rendering: pixelated>
   <img src="Pictures/Landscape2.png" width="256" height="256">
   <img src="Pictures/Landscape3.png" width="256" height="256">
   <img src="Pictures/Landscape4.png" width="256" height="256">
