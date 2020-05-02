@@ -13,12 +13,7 @@ namespace Simple_2D_Landscape.LandscapeEngine
 		Bitmap GetBitmap();
 	}
 
-	public interface ITexturable
-	{
-		
-	}
-
-	public class daseffect : ColorCollection, IBitmapable, ITexturable
+	public class daseffect : ColorCollection, IBitmapable
 	{
 		private float[][][] Buffer { get; set; }	// [Dimensions][Width][Height];
 
@@ -189,7 +184,7 @@ namespace Simple_2D_Landscape.LandscapeEngine
 			return _random.NextDouble() <= CorruptionRate;
 		}
 
-		private void Count(int dim = 1)
+		private void Count()
 		{
 			if(ReCount)
 			{
@@ -200,7 +195,7 @@ namespace Simple_2D_Landscape.LandscapeEngine
 				{
 					for(int j=0; j<Height; ++j)
 					{
-						float value = Buffer[dim][i][j];
+						float value = Buffer[1][i][j];
 
 						if(value < _bufferMinValue)
 						{
@@ -327,8 +322,6 @@ namespace Simple_2D_Landscape.LandscapeEngine
 			if(!IsValid())
 				return null;
 
-			int dim = 1;
-
 			Bitmap bitmap = new Bitmap(Width, Height);
 
 			Count();
@@ -337,7 +330,7 @@ namespace Simple_2D_Landscape.LandscapeEngine
 			{
 				for(int j=0; j<Height; ++j)
 				{
-					bitmap.SetPixel(i, j, GetColor(Buffer[dim][i][j], _bufferMinValue, _bufferMaxValue, WaterLevel));
+					bitmap.SetPixel(i, j, GetColor(Buffer[1][i][j], _bufferMinValue, _bufferMaxValue, WaterLevel));
 				}
 			}
 
