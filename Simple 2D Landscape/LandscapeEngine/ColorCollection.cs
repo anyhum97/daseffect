@@ -34,16 +34,22 @@ namespace Simple_2D_Landscape.LandscapeEngine
 			};
 		}
 
-		protected Color GetColor(float value, float MinValue, float MaxValue, float waterLevel)
+		protected Color GetColor(float value, float minValue, float maxValue, float waterLevel)
 		{
-			return _colorInterpretators[(int)CurrentColorInterpretator](value, MinValue, MaxValue, waterLevel);
+			return _colorInterpretators[(int)CurrentColorInterpretator](value, minValue, maxValue, waterLevel);
 		}
 
-		private static Color MixColor(Color color1, Color color2, float factor1, float factor2)
+		private static Color MixColor(Color color1, Color color2, float value, float border1, float border2)
 		{
-			return Color.FromArgb((int)(color1.R*factor1 + color2.R*factor2),
-				                  (int)(color1.G*factor1 + color2.G*factor2),
-								  (int)(color1.B*factor1 + color2.B*factor2));
+			float distance1 = Math.Abs(border1-value);
+			float distance2 = Math.Abs(border2-value);
+
+			float value1 = distance2/(distance1 + distance2);
+			float value2 = distance1/(distance1 + distance2);
+
+			return Color.FromArgb((int)(color1.R*value1 + color2.R*value2),
+				                  (int)(color1.G*value1 + color2.G*value2),
+								  (int)(color1.B*value1 + color2.B*value2));
 		}
 
 		private static Color GetDefaultColor(float value, float MinValue, float MaxValue, float waterLevel)
@@ -145,27 +151,17 @@ namespace Simple_2D_Landscape.LandscapeEngine
 
 			if(value < waterLevel)
 			{
-				float distance1 = Math.Abs(0.0f-value);
-				float distance2 = Math.Abs(0.5f-value);
-
-				return MixColor(Color.FromArgb(5, 2, 40), 
-					            Color.FromArgb(162, 249, 240),
-								distance2/(distance1+distance2),
-								distance1/(distance1+distance2));
+				return MixColor(Color.FromArgb(5, 2, 40), Color.FromArgb(162, 249, 240), value, 0.0f, waterLevel);
 			}
 
-			if(value < 0.90f)
-			{
-				float distance1 = Math.Abs(0.5f-value);
-				float distance2 = Math.Abs(0.9f-value);
+			//if(value < 0.9f)
+			//{
+				return MixColor(Color.FromArgb(215, 172, 2), Color.FromArgb(11, 237, 5), value, waterLevel, 0.9f);
+			//}
 
-				return MixColor(Color.FromArgb(215, 172, 2), 
-								Color.FromArgb(11, 237, 5),
-								distance2/(distance1+distance2),
-								distance1/(distance1+distance2));
-			}
-
-			return Color.White;
+			//return Color.White;
 		}
+
+
 	}
 }
