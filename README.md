@@ -1,3 +1,7 @@
+<style>
+   img { border: 1px solid #ccc; } .fast { image-rendering: pixelated; }
+</style>
+
 daseffect Project:
 <br>
 <p>
