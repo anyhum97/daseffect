@@ -1,15 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Drawing2D;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using SharpGL;
 using Simple_2D_Landscape.LandscapeEngine;
 
 namespace Simple_2D_Landscape
@@ -45,15 +38,15 @@ namespace Simple_2D_Landscape
 
         private void InitializePhysicalModel()
         {
-            _daseffect = new daseffect(256, 256, colorInterpretator: ColorInterpretationType.WaterFlow);
+            _daseffect = new daseffect(256, 256);
             
             _daseffect.AddNoise(0.0001f, 0.001f, 0.01f);
             _daseffect.AddNoise(0.5f, 1.0f, 0.001f);
              
-            _daseffect.Set(0, _daseffect.Width >> 1, _daseffect.Height >> 1, 2.0f);
-            _daseffect.Set(1, _daseffect.Width >> 1, _daseffect.Height >> 1, 2.0f);
+            //_daseffect.Set(0, _daseffect.Width >> 1, _daseffect.Height >> 1, 2.0f);
+            //_daseffect.Set(1, _daseffect.Width >> 1, _daseffect.Height >> 1, 2.0f);
 
-            _daseffect.CurrentColorInterpretator = ColorInterpretationType.WaterFlow;
+            _daseffect.CurrentColorInterpretator = ColorInterpretationType.Fog;
 
             SetPicture(_daseffect.GetBitmap());
         }
@@ -117,6 +110,22 @@ namespace Simple_2D_Landscape
             long calcTime = sw.ElapsedMilliseconds;
         }
 
+        private void pictureBox1_Click(object sender, EventArgs e)
+        {
+            _timer.Enabled = !_timer.Enabled;
+        }
+
+        private void button7_Click(object sender, EventArgs e)
+        {
+            _daseffect.IterationOptimazed();
+            SetPicture(_daseffect.GetBitmap());
+        }
+
+        private void button8_Click(object sender, EventArgs e)
+        {
+
+        }
+
         //private void openGLControl1_OpenGLDraw_1(object sender, RenderEventArgs args)
         //{
         //    // Create a Simple Sample:
@@ -147,10 +156,5 @@ namespace Simple_2D_Landscape
         //    // Stop Drawing
         //    gl.End();
         //}
-
-        private void pictureBox1_Click(object sender, EventArgs e)
-        {
-            _timer.Enabled = !_timer.Enabled;
-        }
     }
 }
