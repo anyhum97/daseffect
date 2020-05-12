@@ -740,5 +740,297 @@ namespace Simple_2D_Landscape.LandscapeEngine
 
 			ReCount = false;
 		}
+
+		public void ParallelIteration()
+		{
+			if(!IsValid())
+				return;
+
+			const float velocity = 0.50f;	// Phase Speed;
+
+			_bufferMinValue = float.MaxValue;
+			_bufferMaxValue = float.MinValue;
+
+			_bufferSum = 0.0f;
+
+			Parallel.For(0, Width, i =>
+			{
+				unsafe
+				{
+					for(int j=0; j<Height; ++j)
+					{
+						if(IsHappened())
+						{
+							float laplacian =  Get(1, i+1, j) + 
+											   Get(1, i-1, j) + 
+											   Get(1, i, j+1) + 
+											   Get(1, i, j-1) - 4.0f * 
+											   Get(1, i, j);
+
+							Buffer[2][i][j] = 2.0f*Buffer[1][i][j] - Buffer[0][i][j] + velocity*laplacian;
+						}
+						else
+						{
+							Buffer[2][i][j] = Buffer[1][i][j];	// Point Was Not Updated;
+						}
+
+						_bufferMinValue = Math.Min(_bufferMinValue, Buffer[2][i][j]);
+						_bufferMaxValue = Math.Max(_bufferMaxValue, Buffer[2][i][j]);
+
+						_bufferSum += Buffer[2][i][j];
+					}
+				}
+			});
+
+			// Push Buffers:
+
+			float[][] link = Buffer[0];
+
+			Buffer[0] = Buffer[1];
+			Buffer[1] = Buffer[2];
+			
+			Buffer[2] = link;
+
+			ReCount = false;
+		}
+
+		public void IterationParallelIOptimazed()
+		{
+			// This Methode Performs one Iteration of Physical Calculations
+			
+			if(!IsValid())
+				return;
+
+			////////////////////////////////////////////////////////////////////////////////////////////////
+
+			const float velocity = 0.48f;	// Phase Speed;
+
+			// Cycle Optimization Picture:
+
+			// 0##########0
+			// #xxxxxxxxxx#
+			// #xxxxxxxxxx#
+			// #xxxxxxxxxx#
+			// #xxxxxxxxxx#
+			// 0##########0
+
+			_bufferMinValue = float.MaxValue;
+			_bufferMaxValue = float.MinValue;
+
+			_bufferSum = 0.0f;
+
+			// Make Calculation for Top-Left Point:
+
+			if(IsHappened())
+			{
+				float laplacian =  Buffer[1][1][0] + 
+								   Buffer[1][Width-1][0] + 
+								   Buffer[1][0][Height-1] + 
+								   Buffer[1][0][1] - 4.0f * 
+								   Buffer[1][0][0];
+
+				Buffer[2][0][0] = 2.0f*Buffer[1][0][0] - Buffer[0][0][0] + velocity*laplacian;
+			}
+			else
+			{
+				Buffer[2][0][0] = Buffer[1][0][0];	// Point Was Not Updated;
+			}
+
+			// Make Calculation for Top-Right Point:
+
+			if(IsHappened())
+			{
+				float laplacian =  Buffer[1][0][0] + 
+								   Buffer[1][Width-2][0] + 
+								   Buffer[1][Width-1][Height-1] + 
+								   Buffer[1][Width-1][1] - 4.0f * 
+								   Buffer[1][Width-1][0];
+
+				Buffer[2][Width-1][0] = 2.0f*Buffer[1][Width-1][0] - Buffer[0][Width-1][0] + velocity*laplacian;
+			}
+			else
+			{
+				Buffer[2][Width-1][0] = Buffer[1][Width-1][0];	// Point Was Not Updated;
+			}
+
+			// Make Calculation for Down-Left Point:
+			
+			if(IsHappened())
+			{
+				float laplacian =  Buffer[1][1][Height-1] + 
+								   Buffer[1][Width-1][Height-1] + 
+								   Buffer[1][0][Height-2] + 
+								   Buffer[1][0][0] - 4.0f * 
+								   Buffer[1][0][Height-1];
+
+				Buffer[2][0][Height-1] = 2.0f*Buffer[1][0][Height-1] - Buffer[0][0][Height-1] + velocity*laplacian;
+			}
+			else
+			{
+				Buffer[2][0][Height-1] = Buffer[1][0][Height-1];	// Point Was Not Updated;
+			}
+
+			// Make Calculation for Down-Right Point:
+
+			if(IsHappened())
+			{
+				float laplacian =  Buffer[1][0][Height-1] + 
+								   Buffer[1][Width-2][Height-1] + 
+								   Buffer[1][Width-1][Height-2] + 
+								   Buffer[1][Width-1][0] - 4.0f * 
+								   Buffer[1][Width-1][Height-1];
+
+				Buffer[2][Width-1][Height-1] = 2.0f*Buffer[1][Width-1][Height-1] - Buffer[0][Width-1][Height-1] + velocity*laplacian;
+			}
+			else
+			{
+				Buffer[2][Width-1][Height-1] = Buffer[1][Width-1][Height-1];	// Point Was Not Updated;
+			}
+
+			_bufferMinValue = Math.Min(_bufferMinValue, Buffer[2][0][0]);
+			_bufferMinValue = Math.Min(_bufferMinValue, Buffer[2][Width-1][0]);
+			_bufferMinValue = Math.Min(_bufferMinValue, Buffer[2][0][Height-1]);
+			_bufferMinValue = Math.Min(_bufferMinValue, Buffer[2][Width-1][Height-1]);
+
+			_bufferMaxValue = Math.Max(_bufferMaxValue, Buffer[2][0][0]);
+			_bufferMaxValue = Math.Max(_bufferMaxValue, Buffer[2][Width-1][0]);
+			_bufferMaxValue = Math.Max(_bufferMaxValue, Buffer[2][0][Height-1]);
+			_bufferMaxValue = Math.Max(_bufferMaxValue, Buffer[2][Width-1][Height-1]);
+
+			_bufferSum += Buffer[2][0][0];
+			_bufferSum += Buffer[2][Width-1][0];
+			_bufferSum += Buffer[2][0][Height-1];
+			_bufferSum += Buffer[2][Width-1][Height-1];
+			
+			for(int i=1; i<Width-1; ++i)
+			{
+				// Make Calculation for Top Border:
+
+				if(IsHappened())
+				{
+					float laplacian = Buffer[1][i+1][0] + 
+									   Buffer[1][i-1][0] + 
+									   Buffer[1][i][Height-1] + 
+									   Buffer[1][i][1] - 4.0f * 
+									   Buffer[1][i][0];
+
+					Buffer[2][i][0] = 2.0f*Buffer[1][i][0] - Buffer[0][i][0] + velocity*laplacian;
+				}
+				else
+				{
+					Buffer[2][i][0] = Buffer[1][i][0];	// Point Was Not Updated;
+				}
+
+				// Make Calculation for Down Border:
+				if(IsHappened())
+				{
+					float laplacian = Buffer[1][i+1][Height-1] + 
+									   Buffer[1][i-1][Height-1] + 
+									   Buffer[1][i][Height-2] + 
+									   Buffer[1][i][0] - 4.0f * 
+									   Buffer[1][i][Height-1];
+
+					Buffer[2][i][Height-1] = 2.0f*Buffer[1][i][Height-1] - Buffer[0][i][Height-1] + velocity*laplacian;
+				}
+				else
+				{
+					Buffer[2][i][Height-1] = Buffer[1][i][Height-1];	// Point Was Not Updated;
+				}
+
+				_bufferMinValue = Math.Min(_bufferMinValue, Buffer[2][i][0]);
+				_bufferMinValue = Math.Min(_bufferMinValue, Buffer[2][i][Height-1]);
+
+				_bufferMaxValue = Math.Max(_bufferMaxValue, Buffer[2][i][0]);
+				_bufferMaxValue = Math.Max(_bufferMaxValue, Buffer[2][i][Height-1]);
+
+				_bufferSum += Buffer[2][i][0];
+				_bufferSum += Buffer[2][i][Height-1];
+			}
+
+			for(int i=1; i<Height-1; ++i)
+			{
+				// Make Calculation for Left Border:
+
+				if(IsHappened())
+				{
+					float laplacian = Buffer[1][1][i] + 
+									   Buffer[1][Width-1][i] + 
+									   Buffer[1][0][i-1] + 
+									   Buffer[1][0][i+1] - 4.0f * 
+									   Buffer[1][0][i];
+
+					Buffer[2][0][i] = 2.0f*Buffer[1][0][i] - Buffer[0][0][i] + velocity*laplacian;
+				}
+				else
+				{
+					Buffer[2][0][i] = Buffer[1][0][i];	// Point Was Not Updated;
+				}
+
+				// Make Calculation for Right Border:
+
+				if(IsHappened())
+				{
+					float laplacian =  Buffer[1][0][i] + 
+									   Buffer[1][Width-2][i] + 
+									   Buffer[1][Width-1][i-1] + 
+									   Buffer[1][Width-1][i+1] - 4.0f * 
+									   Buffer[1][Width-1][i];
+
+					Buffer[2][Width-1][i] = 2.0f*Buffer[1][Width-1][i] - Buffer[0][Width-1][i] + velocity*laplacian;
+				}
+				else
+				{
+					Buffer[2][Width-1][i] = Buffer[1][Width-1][i];	// Point Was Not Updated;
+				}
+
+				_bufferMinValue = Math.Min(_bufferMinValue, Buffer[2][0][i]);
+				_bufferMinValue = Math.Min(_bufferMinValue, Buffer[2][Width-1][i]);
+
+				_bufferMaxValue = Math.Max(_bufferMaxValue, Buffer[2][0][i]);
+				_bufferMaxValue = Math.Max(_bufferMaxValue, Buffer[2][Width-1][i]);
+
+				_bufferSum += Buffer[2][0][i];
+				_bufferSum += Buffer[2][Width-1][i];
+			}
+
+			Parallel.For(1, Width-1, i =>
+			{
+				for(int j=1; j<Height-1; ++j)
+				{
+					// Make Calculation for Internal Points:
+					
+					if(IsHappened())
+					{
+						float laplacian =  Buffer[1][i+1][j] + 
+										   Buffer[1][i-1][j] + 
+										   Buffer[1][i][j+1] + 
+										   Buffer[1][i][j-1] - 4.0f * 
+										   Buffer[1][i][j];
+
+						Buffer[2][i][j] = 2.0f*Buffer[1][i][j] - Buffer[0][i][j] + velocity*laplacian;
+					}
+					else
+					{
+						Buffer[2][i][j] = Buffer[1][i][j];	// Point Was Not Updated;
+					}
+
+					_bufferMinValue = Math.Min(_bufferMinValue, Buffer[2][i][j]);
+					_bufferMaxValue = Math.Max(_bufferMaxValue, Buffer[2][i][j]);
+
+					_bufferSum += Buffer[2][i][j];
+				}
+			});
+
+			// Push Buffers:
+
+			float[][] link = Buffer[0];
+
+			Buffer[0] = Buffer[1];
+			Buffer[1] = Buffer[2];
+			
+			Buffer[2] = link;
+
+			ReCount = false;
+		}
 	}
 }

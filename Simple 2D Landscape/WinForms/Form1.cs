@@ -39,7 +39,7 @@ namespace Simple_2D_Landscape
 
         private void InitializePhysicalModel()
         {
-            _daseffect = new daseffect(256, 256);
+            _daseffect = new daseffect(512, 512);
             
             _daseffect.AddNoise(0.0001f, 0.001f, 0.01f);
             _daseffect.AddNoise(0.5f, 1.0f, 0.001f);
@@ -56,7 +56,7 @@ namespace Simple_2D_Landscape
         {
             _timer = new Timer();
 
-            _timer.Interval = 25;
+            _timer.Interval = 40;
             _timer.Enabled = false;
 
             _timer.Tick += new EventHandler(CalcTimerProcessor);
@@ -106,11 +106,12 @@ namespace Simple_2D_Landscape
             Stopwatch sw = new Stopwatch();
 
             sw.Start();
-            _daseffect.IterationOptimazed();
+            _daseffect.IterationParallelIOptimazed();
             SetPicture(_daseffect.GetBitmap());
             sw.Stop();
             
             long calcTime = sw.ElapsedMilliseconds;
+            //_timer.Interval = (int)calcTime;
         }
 
         private void pictureBox1_Click(object sender, EventArgs e)
@@ -120,7 +121,7 @@ namespace Simple_2D_Landscape
 
         private void button7_Click(object sender, EventArgs e)
         {
-            _daseffect.IterationOptimazed();
+            _daseffect.ParallelIteration();
             SetPicture(_daseffect.GetBitmap());
         }
 
