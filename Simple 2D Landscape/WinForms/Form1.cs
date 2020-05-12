@@ -106,7 +106,7 @@ namespace Simple_2D_Landscape
             Stopwatch sw = new Stopwatch();
 
             sw.Start();
-            _daseffect.IterationParallelIOptimazed();
+            _daseffect.ParallelIteration();
             SetPicture(_daseffect.GetBitmap());
             sw.Stop();
             

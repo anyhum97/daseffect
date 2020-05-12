@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -741,46 +742,164 @@ namespace Simple_2D_Landscape.LandscapeEngine
 			ReCount = false;
 		}
 
+		private void Method1(Object state)
+		{
+			int step = Width/4;
+
+			float velocity = (float)state;
+
+			for(int i=0; i<step; ++i)
+			{
+				for(int j=0; j<Height; ++j)
+				{
+					if(IsHappened())
+					{
+						float laplacian =  Get(1, i+1, j) + 
+										   Get(1, i-1, j) + 
+										   Get(1, i, j+1) + 
+										   Get(1, i, j-1) - 4.0f * 
+										   Get(1, i, j);
+
+						Buffer[2][i][j] = 2.0f*Buffer[1][i][j] - Buffer[0][i][j] + velocity*laplacian;
+					}
+					else
+					{
+						Buffer[2][i][j] = Buffer[1][i][j];	// Point Was Not Updated;
+					}
+
+					_bufferMinValue = Math.Min(_bufferMinValue, Buffer[2][i][j]);
+					_bufferMaxValue = Math.Max(_bufferMaxValue, Buffer[2][i][j]);
+
+					_bufferSum += Buffer[2][i][j];
+				}
+			}
+		}
+
+		private void Method2(Object state)
+		{
+			int step = Width/4;
+
+			float velocity = (float)state;
+
+			for(int i=step; i<2*step; ++i)
+			{
+				for(int j=0; j<Height; ++j)
+				{
+					if(IsHappened())
+					{
+						float laplacian =  Get(1, i+1, j) + 
+										   Get(1, i-1, j) + 
+										   Get(1, i, j+1) + 
+										   Get(1, i, j-1) - 4.0f * 
+										   Get(1, i, j);
+
+						Buffer[2][i][j] = 2.0f*Buffer[1][i][j] - Buffer[0][i][j] + velocity*laplacian;
+					}
+					else
+					{
+						Buffer[2][i][j] = Buffer[1][i][j];	// Point Was Not Updated;
+					}
+
+					_bufferMinValue = Math.Min(_bufferMinValue, Buffer[2][i][j]);
+					_bufferMaxValue = Math.Max(_bufferMaxValue, Buffer[2][i][j]);
+
+					_bufferSum += Buffer[2][i][j];
+				}
+			}
+		}
+
+		private void Method3(Object state)
+		{
+			int step = Width/4;
+
+			float velocity = (float)state;
+
+			for(int i=2*step; i<3*step; ++i)
+			{
+				for(int j=0; j<Height; ++j)
+				{
+					if(IsHappened())
+					{
+						float laplacian =  Get(1, i+1, j) + 
+										   Get(1, i-1, j) + 
+										   Get(1, i, j+1) + 
+										   Get(1, i, j-1) - 4.0f * 
+										   Get(1, i, j);
+
+						Buffer[2][i][j] = 2.0f*Buffer[1][i][j] - Buffer[0][i][j] + velocity*laplacian;
+					}
+					else
+					{
+						Buffer[2][i][j] = Buffer[1][i][j];	// Point Was Not Updated;
+					}
+
+					_bufferMinValue = Math.Min(_bufferMinValue, Buffer[2][i][j]);
+					_bufferMaxValue = Math.Max(_bufferMaxValue, Buffer[2][i][j]);
+
+					_bufferSum += Buffer[2][i][j];
+				}
+			}
+		}
+
+		private void Method4(Object state)
+		{
+			int step = Width/4;
+
+			float velocity = (float)state;
+
+			for(int i=3*step; i<Width; ++i)
+			{
+				for(int j=0; j<Height; ++j)
+				{
+					if(IsHappened())
+					{
+						float laplacian =  Get(1, i+1, j) + 
+										   Get(1, i-1, j) + 
+										   Get(1, i, j+1) + 
+										   Get(1, i, j-1) - 4.0f * 
+										   Get(1, i, j);
+
+						Buffer[2][i][j] = 2.0f*Buffer[1][i][j] - Buffer[0][i][j] + velocity*laplacian;
+					}
+					else
+					{
+						Buffer[2][i][j] = Buffer[1][i][j];	// Point Was Not Updated;
+					}
+
+					_bufferMinValue = Math.Min(_bufferMinValue, Buffer[2][i][j]);
+					_bufferMaxValue = Math.Max(_bufferMaxValue, Buffer[2][i][j]);
+
+					_bufferSum += Buffer[2][i][j];
+				}
+			}
+		}
+
 		public void ParallelIteration()
 		{
 			if(!IsValid())
 				return;
 
-			const float velocity = 0.50f;	// Phase Speed;
+			float velocity = 0.50f;	// Phase Speed;
 
 			_bufferMinValue = float.MaxValue;
 			_bufferMaxValue = float.MinValue;
 
 			_bufferSum = 0.0f;
 
-			Parallel.For(0, Width, i =>
-			{
-				unsafe
-				{
-					for(int j=0; j<Height; ++j)
-					{
-						if(IsHappened())
-						{
-							float laplacian =  Get(1, i+1, j) + 
-											   Get(1, i-1, j) + 
-											   Get(1, i, j+1) + 
-											   Get(1, i, j-1) - 4.0f * 
-											   Get(1, i, j);
+			Thread thread1 = new Thread(Method1);
+			Thread thread2 = new Thread(Method2);
+			Thread thread3 = new Thread(Method3);
+			Thread thread4 = new Thread(Method4);
 
-							Buffer[2][i][j] = 2.0f*Buffer[1][i][j] - Buffer[0][i][j] + velocity*laplacian;
-						}
-						else
-						{
-							Buffer[2][i][j] = Buffer[1][i][j];	// Point Was Not Updated;
-						}
+			thread1.Start(velocity);
+			thread2.Start(velocity);
+			thread3.Start(velocity);
+			thread4.Start(velocity);
 
-						_bufferMinValue = Math.Min(_bufferMinValue, Buffer[2][i][j]);
-						_bufferMaxValue = Math.Max(_bufferMaxValue, Buffer[2][i][j]);
-
-						_bufferSum += Buffer[2][i][j];
-					}
-				}
-			});
+			thread1.Join();
+			thread2.Join();
+			thread3.Join();
+			thread4.Join();
 
 			// Push Buffers:
 
