@@ -28,10 +28,6 @@ namespace Simple_2D_Landscape.LandscapeEngine
 		private float _bufferMaxValue;
 		private float _bufferSum;
 
-		private unsafe readonly struct Data
-		{
-			public readonly float* buffer;
-		}
 
 		[DllImport(@"Cuda Implementation.dll")]
 		public static extern int CudaStart(int width, int height);
@@ -39,11 +35,20 @@ namespace Simple_2D_Landscape.LandscapeEngine
 		[DllImport(@"Cuda Implementation.dll")]
 		public static extern void CudaFree();
 
+		[DllImport(@"Cuda Implementation.dll", CallingConvention = CallingConvention.Cdecl)]
+		public static extern bool CudaSetState([In, Out] float[] buffer, int width, int height);
+
 		[DllImport(@"Cuda Implementation.dll")]
-		public static extern float CudaCalc();
+		public static extern int CudaCalc();
 		
 		[DllImport(@"Cuda Implementation.dll", CallingConvention = CallingConvention.Cdecl)]
 		public static extern bool GetCurrentFrame([In, Out] float[] frame);
+
+		[DllImport(@"Cuda Implementation.dll", CallingConvention = CallingConvention.Cdecl)]
+		public static extern int GetColorInterpretatorTitle([In, Out] StringBuilder str, int ColorInterpretatorIndex);
+
+		[DllImport(@"Cuda Implementation.dll")]
+		public static extern int GetColorInterpretatorCount();
 
 		/// <summary>
 		/// Shows Should Metrics be Recalculated;
@@ -126,18 +131,42 @@ namespace Simple_2D_Landscape.LandscapeEngine
 		{
 			// Minimum Buffer Size is [3][3][3];
 
-			var x = CudaStart(16, 16);
-			var y = CudaCalc();
+			//var x = CudaStart(16, 16);
 			
-			float[] frame = new float[1024];
+			//float[] state = new float[2*16*16];
+			//float[] frame = new float[16*16];
 
-			var z = GetCurrentFrame(frame);
+			//for(int i=0; i<16; ++i)
+			//{
+			//	for(int j=0; j<16; ++j)
+			//	{
+			//		state[i*16+j] = i*16.0f+j;
+			//	}
+			//}
 
-			if(width < 3 || height < 3)
-			{
-				Clear();
-				return;
-			}
+			//for(int i=0; i<16; ++i)
+			//{
+			//	for(int j=0; j<16; ++j)
+			//	{
+			//		state[256+i*16+j] = -(i*16.0f+j);
+			//	}
+			//}
+
+			//var k = CudaSetState(state, 16, 16);
+
+			//var y = CudaCalc();
+
+			//var z = GetCurrentFrame(frame);
+
+			//if(width < 3 || height < 3)
+			//{
+			//	Clear();
+			//	return;
+			//}
+
+			var result = GetColorInterpretatorTitle(0, out string str);
+
+			var c = GetColorInterpretatorCount();
 
 			Buffer = new float[3][][];
 
@@ -370,7 +399,11 @@ namespace Simple_2D_Landscape.LandscapeEngine
 			{
 				for(int j=0; j<Height; ++j)
 				{
-					bitmap.SetPixel(i, j, GetColor(Buffer[1][i][j], _bufferMinValue, _bufferMaxValue, WaterLevel));
+					var color = GetColor(Buffer[1][i][j], _bufferMinValue, _bufferMaxValue, WaterLevel);
+
+					int intColor = SetColor(color);
+
+					bitmap.SetPixel(i, j, GetColor(intColor));
 				}
 			}
 
@@ -770,5 +803,51 @@ namespace Simple_2D_Landscape.LandscapeEngine
 
 			ReCount = false;
 		}
+
+		private Color GetColor(int intColor)
+		{
+			return Color.FromArgb((byte)(intColor >> 24), 
+								  (byte)(intColor >> 16), 
+								  (byte)(intColor >> 8), 
+								  (byte)(intColor));
+		}
+
+		private int SetColor(Color color)
+		{
+			return (-16777216) | (color.R << 16) | (color.G << 8) | color.B;
+		}
+
+		private bool GetColorInterpretatorTitle(int index, out string str)
+		{
+			StringBuilder stringBuilder = new StringBuilder(64);
+
+			int len = GetColorInterpretatorTitle(stringBuilder, index);
+
+			if(len <= 0)
+			{
+				str = "Out Of Range";
+				return false;
+			}
+
+			if(len > 64)
+			{
+				len = 64;
+			}
+
+			str = stringBuilder.ToString(0, len);
+			
+			return true;
+		}
+
+		//private string GetColorInterpretatorTitle(int index)
+		//{
+		//	char[] sim = new char[128];
+
+		//	int len = GetColorInterpretatorTitle(sim, index);
+
+		//	string str = new string(sim, 0, len);
+
+		//	return str;
+		//}
 	}
 }

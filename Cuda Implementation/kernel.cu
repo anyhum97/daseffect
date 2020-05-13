@@ -12,10 +12,29 @@ static int Height;
 
 static bool IsLoaded = false;
 
+static cudaEvent_t start;
+static cudaEvent_t stop;
+
 ////////////////////////////////////////////////////////////////////////
 
 static Reflection<float> Buffer;
 static Reflection<float> Frame;
+
+static Reflection<float> MaxValueBuffer;
+static Reflection<float> MinValueBuffer;
+static Reflection<float> SumBuffer;
+
+static Reflection<float> MaxValue;
+static Reflection<float> MinValue;
+
+static Reflection<float> Sum;
+
+////////////////////////////////////////////////////////////////////////
+
+__inline__ __device__ int Color(const int R, const int G, const int B)
+{
+	return (-16777216) | (R << 16) | (G << 8) | B;
+}
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -46,13 +65,140 @@ __inline__ __device__ unsigned int GetBufferIndex(const unsigned int dim, int x,
 	return dim*Width*Height + x*Height + y;
 }
 
+__inline__ __device__ unsigned int GetFrameIndex(const unsigned int x, const unsigned int y, const unsigned int Width, const unsigned int Height)
+{
+	// Frame[Width][Height];
+
+	return x*Height + y;
+}
+
 ////////////////////////////////////////////////////////////////////////
 
-__global__ void CudaSample(float* value)
+typedef int (*ColorInterpretator)(float value, float maxValue, float minValue, float WaterLevel);
+
+namespace ColorInterpretators
+{
+	////////////////////////////////////////////////////////////////////////
+
+	__device__ int DefaultColor(float value, float MaxValue, float MinValue, float WaterLevel)
+	{
+		if(value == 0.0f)
+		{
+			return Color(255, 255, 255);
+		}
+
+		if(value < 0.0f)
+		{
+			int intensity = (int)(255.0f * (value / MinValue));
+		
+			return Color(0, 0, intensity);
+		}
+		else
+		{
+			int intensity = (int)(255.0f-255.0f * (value / MaxValue));
+		
+			return Color(intensity, intensity, intensity);
+		}
+	}
+
+	////////////////////////////////////////////////////////////////////////
+
+	ColorInterpretator Interpretators[] = 
+	{
+		DefaultColor,
+	};
+
+	const unsigned int Count = 1;
+
+	char* Titles[] = 
+	{
+		"DefaultColor",
+	};
+}
+
+////////////////////////////////////////////////////////////////////////
+
+__global__ void CudaSample(float* Buffer, 
+						   const unsigned int Width, 
+						   const unsigned int Height, 
+                           const float velocity)
+{
+	/// <<<Width, Height>>>
+
+    const unsigned int block = blockIdx.x;
+    const unsigned int thread = threadIdx.x;
+
+    if(block >= Width || thread >= Height)
+    {
+        return;
+    }
+
+	const float laplacian = Buffer[GetBufferIndex(1, block+1, thread, Width, Height)] + 
+		                    Buffer[GetBufferIndex(1, block-1, thread, Width, Height)] +
+		                    Buffer[GetBufferIndex(1, block, thread+1, Width, Height)] + 
+		                    Buffer[GetBufferIndex(1, block, thread-1, Width, Height)] - 4.0f * 
+		                    Buffer[GetBufferIndex(1, block, thread, Width, Height)];
+
+	Buffer[GetBufferIndex(2, block, thread, Width, Height)] = 2.0f*Buffer[GetBufferIndex(1, block, thread, Width, Height)] + velocity*laplacian;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+__global__ void ReCountPart1(float* Buffer, float* MaxValueBuffer, float* MinValueBuffer, float* SumBuffer, const unsigned int Width, const unsigned int Height)
+{
+	/// <<<Width, 1>>>
+
+	const unsigned int block = blockIdx.x;
+    const unsigned int thread = threadIdx.x;
+
+    if(block >= Width || thread > 0)
+    {
+        return;
+    }
+
+	////////////////////////////////////////////////////////////////////////
+
+	float max = -FLT_MAX;
+	float min = FLT_MAX;
+
+	float sum = 0.0f;
+
+	for(int i=0; i<Height; ++i)
+	{
+		const float value = Buffer[GetBufferIndex(1, block, i, Width, Height)];
+
+		if(value < min)
+		{
+			min = value;
+		}
+
+		if(value > max)
+		{
+			max = value;
+		}
+
+		sum += value;
+	}
+
+	MinValueBuffer[block] = min;
+	MaxValueBuffer[block] = max;
+
+	SumBuffer[block] = sum;
+}
+
+__global__ void ReCountPart2(float* Buffer, 
+							 float* MaxValueBuffer, 
+							 float* MinValueBuffer, 
+							 float* SumBuffer, 
+							 float* MaxValue, 
+							 float* MinValue, 
+							 float* Sum, 
+							 const unsigned int Width, 
+							 const unsigned int Height)
 {
 	/// <<<1, 1>>>
 
-    const unsigned int block = blockIdx.x;
+	const unsigned int block = blockIdx.x;
     const unsigned int thread = threadIdx.x;
 
     if(block || thread)
@@ -60,10 +206,78 @@ __global__ void CudaSample(float* value)
         return;
     }
 
-	for(int i=0; i<16; ++i)
+	////////////////////////////////////////////////////////////////////////
+
+	float max = -FLT_MAX;
+	float min = FLT_MAX;
+
+	float sum = 0.0f;
+
+	for(int i=0; i<Width; ++i)
 	{
-		++value[0];
+		if(MaxValueBuffer[i] > max)
+		{
+			max = MaxValueBuffer[i];
+		}
+
+		if(MinValueBuffer[i] < min)
+		{
+			min = MinValueBuffer[i];
+		}
+
+		sum += SumBuffer[i];
 	}
+
+	MaxValue[0] = max;
+	MinValue[0] = min;
+
+	Sum[0] = sum;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+__global__ void CudaFrame(float* Buffer, 
+						  float* Frame,
+						  float* MaxValue, 
+						  float* MinValue, 
+						  ColorInterpretator Interpretator,
+						  const float WaterLevel,
+						  const unsigned int Width, 
+						  const unsigned int Height)
+{
+	/// <<<Width, Height>>>
+
+    const unsigned int block = blockIdx.x;
+    const unsigned int thread = threadIdx.x;
+
+    if(block >= Width || thread >= Height)
+    {
+        return;
+    }
+
+	const float value = Buffer[GetBufferIndex(1, block, thread, Width, Height)];
+
+	Frame[GetFrameIndex(block, thread, Width, Height)] = Interpretator(value, MaxValue[0], MinValue[0], WaterLevel);
+}
+
+void ReCount()
+{
+	ReCountPart1<<<Width, 1>>>(Device(Buffer), 
+							   Device(MaxValueBuffer), 
+							   Device(MinValueBuffer), 
+							   Device(SumBuffer), 
+							   Width, 
+							   Height);
+
+	ReCountPart2<<<1, 1>>>(Device(Buffer), 
+						   Device(MaxValueBuffer), 
+						   Device(MinValueBuffer), 
+						   Device(SumBuffer), 
+						   Device(MaxValue), 
+						   Device(MinValue), 
+						   Device(Sum), 
+						   Width, 
+						   Height);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -75,6 +289,16 @@ static void CudaMalloc(int Width, int Height)
 	Buffer = Malloc<float>(3*Width*Height);
 
 	Frame = Malloc<float>(Width*Height);
+
+	MaxValueBuffer = Malloc<float>(Width);
+	MinValueBuffer = Malloc<float>(Width);
+
+	SumBuffer = Malloc<float>(Width);
+
+	MaxValue = Malloc<float>(1);
+	MinValue = Malloc<float>(1);
+
+	Sum = Malloc<float>(1);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -85,6 +309,11 @@ void CudaFree()
 {
 	Free(Buffer);
 	Free(Frame);
+
+	Free(MaxValueBuffer);
+	Free(MinValueBuffer);
+
+	Free(SumBuffer);
 
 	IsLoaded = false;
 }
@@ -114,9 +343,9 @@ int CudaStart(int width, int height)
 
 extern "C" __declspec(dllexport)
 
-bool CudaSetState(float* input, int width, int height)
+bool CudaSetState(float* buffer, int width, int height)
 {
-	if(input == nullptr || width < 3 || height < 3)
+	if(buffer == nullptr || width < 3 || height < 3)
 	{
 		return false;
 	}
@@ -133,7 +362,7 @@ bool CudaSetState(float* input, int width, int height)
 
 	const unsigned int size = 2*width*height*sizeof(float);
 
-	memcpy(Host(Buffer), input, size);
+	memcpy(Host(Buffer), buffer, size);
 
 	return Send(Buffer);
 }
@@ -142,41 +371,142 @@ bool CudaSetState(float* input, int width, int height)
 
 extern "C" __declspec(dllexport)
 
-bool GetCurrentFrame(float* frame)
+int GetCurrentFrame(float* frame, int ColorInterpretatorIndex, float WaterLevel)
 {
-	Frame.host[0] = 1.23f;
-	Frame.host[1] = -2.25f;
-	Frame.host[2] = 7.14f;
-
-	Send(Frame);
-
-	if(Receive(Frame))
+	if(!IsLoaded || !IsValid(Buffer) || !IsValid(Frame))
 	{
-		memcpy(frame, Host(Frame), Frame.size);
-
-		return true;
+		return -1;
 	}
 
-	return false;
+	////////////////////////////////////////////////////////////////////////
+
+	if(ColorInterpretatorIndex > ColorInterpretators::Count)
+	{
+		ColorInterpretatorIndex = 0;
+	}
+
+	ColorInterpretator Selected = ColorInterpretators::Interpretators[ColorInterpretatorIndex];
+
+	////////////////////////////////////////////////////////////////////////
+	
+	cudaEventCreate(&start);
+	cudaEventCreate(&stop);
+
+	cudaEventRecord(start, 0);
+
+	////////////////////////////////////////////////////////////////////////
+
+	ReCount();
+	
+	if(Height <= 1024)
+	{
+		CudaFrame<<<Width, Height>>>(Device(Buffer), 
+									 Device(Frame),
+									 Device(MaxValue), 
+									 Device(MinValue), 
+									 Selected, 
+									 WaterLevel, 
+									 Width, 
+									 Height);
+									 
+	}
+
+	if(!Receive(Frame))
+	{
+		return -1;
+	}
+
+	memcpy(frame, Host(Frame), Frame.size);
+
+	cudaEventRecord(stop, 0);
+	cudaEventSynchronize(stop);
+
+	float time = 0;
+
+	cudaEventElapsedTime(&time, start, stop);
+
+	cudaEventDestroy(start);
+	cudaEventDestroy(stop);
+
+	return (int)(time+0.5f);
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 extern "C" __declspec(dllexport)
 
-float CudaCalc()
+int CudaCalc(float velocity)
 {
-	CudaSample<<<1, 1>>>(Device(Buffer));
-	Receive(Buffer, 1);
+	if(!IsLoaded || !IsValid(Buffer) || !IsValid(Frame))
+	{
+		return -1;
+	}
 
-	return Host(Buffer)[0];
+	////////////////////////////////////////////////////////////////////////
+
+	cudaEventCreate(&start);
+	cudaEventCreate(&stop);
+
+	cudaEventRecord(start, 0);
+
+	////////////////////////////////////////////////////////////////////////
+
+	if(Height <= 1024)
+	{
+		CudaSample<<<Width, Height>>>(Device(Buffer), Width, Height, velocity);
+	}
+
+	////////////////////////////////////////////////////////////////////////
+
+	cudaEventRecord(stop, 0);
+	cudaEventSynchronize(stop);
+
+	float time = 0;
+
+	cudaEventElapsedTime(&time, start, stop);
+
+	cudaEventDestroy(start);
+	cudaEventDestroy(stop);
+
+	return (int)(time+0.5f);
 }
 
 ////////////////////////////////////////////////////////////////////////
 
+extern "C" __declspec(dllexport)
 
+int GetColorInterpretatorCount()
+{
+	return ColorInterpretators::Count;
+}
 
+////////////////////////////////////////////////////////////////////////
 
+extern "C" __declspec(dllexport)
+
+int GetColorInterpretatorTitle(char* str, int ColorInterpretatorIndex)
+{
+	if(ColorInterpretatorIndex > ColorInterpretators::Count)
+	{
+		return 0;
+	}
+
+	int len = strlen(ColorInterpretators::Titles[ColorInterpretatorIndex]);
+	memcpy(str, ColorInterpretators::Titles[ColorInterpretatorIndex], len);	
+	return len;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+extern "C" __declspec(dllexport) float GetSum()
+{
+	if(Receive(Sum))
+	{
+		return Host(Sum)[0];
+	}
+
+	return 0.0f;
+}
 
 
 
