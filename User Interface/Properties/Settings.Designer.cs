@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Simple_2D_Landscape.Properties
+namespace User_Interface.Properties
 {
 
 
