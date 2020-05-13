@@ -46,7 +46,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="LandscapeEngine\ColorCollection.cs" />
     <Compile Include="LandscapeEngine\Daseffect.cs" />
     <Compile Include="WinForms\Form1.cs">
       <SubType>Form</SubType>

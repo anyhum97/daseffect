@@ -40,15 +40,16 @@ namespace Simple_2D_Landscape
         private void InitializePhysicalModel()
         {
             _daseffect = new Daseffect(256, 256);
+            SetPicture(_daseffect.GetBitmap());
 
-           pictureBox1.Image = _daseffect.GetBitmap();
+           //pictureBox1.Image = _daseffect.GetBitmap();
         }
 
         private void InitializeTimer()
         {
             _timer = new Timer();
 
-            _timer.Interval = 25;
+            _timer.Interval = 40;
             _timer.Enabled = false;
 
             _timer.Tick += new EventHandler(CalcTimerProcessor);
@@ -60,7 +61,7 @@ namespace Simple_2D_Landscape
 
             trackBar1.Value = (int)(Math.Round(trackBar1.Maximum*_daseffect.WaterLevel / Daseffect.MaxWaterLevel));
 
-            comboBox1.DataSource =  Enum.GetValues(typeof(ColorInterpretationType));
+            //comboBox1.DataSource =  Enum.GetValues(typeof(ColorInterpretationType));
 
             //comboBox1.SelectedItem = _daseffect.CurrentColorInterpretator;
 
@@ -82,7 +83,7 @@ namespace Simple_2D_Landscape
             
             label2.Text = Math.Round(100*_daseffect.WaterLevel) + "%";
 
-            SetPicture(_daseffect.GetBitmap());
+            //SetPicture(_daseffect.GetBitmap());
         }
 
         public Form1()
@@ -90,7 +91,7 @@ namespace Simple_2D_Landscape
 			InitializeComponent();
             InitializePhysicalModel();
             InitializeViewModel();
-            InitializeTimer();            
+            InitializeTimer();
 		}
 
         private void CalcTimerProcessor(Object myObject, EventArgs myEventArgs)
@@ -98,6 +99,8 @@ namespace Simple_2D_Landscape
             Stopwatch sw = new Stopwatch();
 
             sw.Start();
+            _daseffect.Iteration();
+            //pictureBox1.Image = _daseffect.GetBitmap();
             //_daseffect.IterationOptimazed();
             SetPicture(_daseffect.GetBitmap());
             sw.Stop();

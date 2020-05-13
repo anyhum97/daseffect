@@ -65,7 +65,7 @@ __inline__ __host__ __device__ unsigned int GetBufferIndex(const unsigned int di
 	return dim*Width*Height + x*Height + y;
 }
 
-__inline__ __device__ unsigned int GetFrameIndex(const unsigned int x, const unsigned int y, const unsigned int Width, const unsigned int Height)
+__inline__ __host__ __device__ unsigned int GetFrameIndex(const unsigned int x, const unsigned int y, const unsigned int Width, const unsigned int Height)
 {
 	// Frame[Width][Height];
 
@@ -103,7 +103,7 @@ namespace ColorInterpretators
 
 	////////////////////////////////////////////////////////////////////////
 
-	ColorInterpretator Interpretators[] = 
+	__device__ ColorInterpretator Interpretators[] = 
 	{
 		DefaultColor,
 	};
@@ -121,7 +121,7 @@ namespace ColorInterpretators
 __global__ void CudaSample(float* Buffer, 
 						   const unsigned int Width, 
 						   const unsigned int Height, 
-                           const float velocity)
+                           const float phaseSpeed)
 {
 	/// <<<Width, Height>>>
 
@@ -139,12 +139,24 @@ __global__ void CudaSample(float* Buffer,
 		                    Buffer[GetBufferIndex(1, block, thread-1, Width, Height)] - 4.0f * 
 		                    Buffer[GetBufferIndex(1, block, thread, Width, Height)];
 
-	Buffer[GetBufferIndex(2, block, thread, Width, Height)] = 2.0f*Buffer[GetBufferIndex(1, block, thread, Width, Height)] + velocity*laplacian;
+	Buffer[GetBufferIndex(2, block, thread, Width, Height)] = 2.0f*Buffer[GetBufferIndex(1, block, thread, Width, Height)] + phaseSpeed*laplacian;
+}
+
+__global__ void PushBuffers(float* Buffer)
+{
+	///	<<<1, 1>>>
+
+
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-__global__ void ReCountPart1(float* Buffer, float* MaxValueBuffer, float* MinValueBuffer, float* SumBuffer, const unsigned int Width, const unsigned int Height)
+__global__ void ReCountPart1(float* Buffer, 
+							 float* MaxValueBuffer, 
+							 float* MinValueBuffer, 
+							 float* SumBuffer, 
+							 const unsigned int Width, 
+							 const unsigned int Height)
 {
 	/// <<<Width, 1>>>
 
@@ -239,9 +251,9 @@ __global__ void ReCountPart2(float* Buffer,
 __global__ void CudaFrame(float* Buffer, 
 						  int* Frame,
 						  float* MaxValue, 
-						  float* MinValue, 
-						  ColorInterpretator Interpretator,
+						  float* MinValue, 						  
 						  const float WaterLevel,
+						  const unsigned int InterpretatorIndex,
 						  const unsigned int Width, 
 						  const unsigned int Height)
 {
@@ -257,7 +269,7 @@ __global__ void CudaFrame(float* Buffer,
 
 	const float value = Buffer[GetBufferIndex(1, block, thread, Width, Height)];
 
-	Frame[GetFrameIndex(block, thread, Width, Height)] = Interpretator(value, MaxValue[0], MinValue[0], WaterLevel);
+	Frame[GetFrameIndex(block, thread, Width, Height)] = ColorInterpretators::Interpretators[InterpretatorIndex](value, MaxValue[0], MinValue[0], WaterLevel);
 }
 
 void ReCount()
@@ -425,9 +437,9 @@ int GetCurrentFrame(int* frame, int ColorInterpretatorIndex, float WaterLevel)
 		CudaFrame<<<Width, Height>>>(Device(Buffer), 
 									 Device(Frame),
 									 Device(MaxValue), 
-									 Device(MinValue), 
-									 Selected, 
+									 Device(MinValue), 									 
 									 WaterLevel, 
+									 ColorInterpretatorIndex, 
 									 Width, 
 									 Height);
 									 
@@ -450,14 +462,14 @@ int GetCurrentFrame(int* frame, int ColorInterpretatorIndex, float WaterLevel)
 
 	memcpy(frame, Host(Frame), Frame.size);
 
-	return (int)(time+0.5f);
+	return Frame.size;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 extern "C" __declspec(dllexport)
 
-int CudaCalc(float velocity)
+int CudaCalc(float phaseSpeed)
 {
 	if(!IsLoaded || !IsValid(Buffer) || !IsValid(Frame))
 	{
@@ -475,7 +487,7 @@ int CudaCalc(float velocity)
 
 	if(Height <= 1024)
 	{
-		CudaSample<<<Width, Height>>>(Device(Buffer), Width, Height, velocity);
+		CudaSample<<<Width, Height>>>(Device(Buffer), Width, Height, phaseSpeed);
 	}
 
 	////////////////////////////////////////////////////////////////////////

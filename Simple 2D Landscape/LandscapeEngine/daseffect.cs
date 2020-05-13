@@ -24,6 +24,8 @@ namespace Simple_2D_Landscape.LandscapeEngine
 
 		private float _waterLevel;
 
+		private float _phaseSpeed;
+
 		[DllImport(@"Cuda Implementation.dll")]
 		private static extern bool CudaStart(int width, int height);
 
@@ -40,7 +42,7 @@ namespace Simple_2D_Landscape.LandscapeEngine
 		private static extern bool SetDefaultState();
 
 		[DllImport(@"Cuda Implementation.dll")]
-		private static extern int CudaCalc(float velocity);
+		private static extern int CudaCalc(float phaseSpeed);
 		
 		[DllImport(@"Cuda Implementation.dll", CallingConvention = CallingConvention.Cdecl)]
 		private static extern int GetCurrentFrame([In, Out] int[] frame, int ColorInterpretatorIndex, float WaterLevel);
@@ -68,10 +70,7 @@ namespace Simple_2D_Landscape.LandscapeEngine
 		/// </summary>
 		public double CorruptionRate
 		{
-			get
-			{
-				return _corruptionRate;
-			}
+			get => _corruptionRate;
 			
 			set
 			{
@@ -92,10 +91,7 @@ namespace Simple_2D_Landscape.LandscapeEngine
 
 		public float WaterLevel
 		{
-			get
-			{
-				return _waterLevel;
-			}
+			get => _waterLevel;
 			
 			set
 			{
@@ -109,10 +105,38 @@ namespace Simple_2D_Landscape.LandscapeEngine
 			}
 		}
 
+		public const float DefaultPhaseSpeed = 0.495f;
+		
+		public const float MinPhaseSpeed = 0.01f;
+		public const float MaxPhaseSpeed = 0.50f;
+
+		public float PhaseSpeed
+		{
+			get => _phaseSpeed;
+
+			set
+			{
+				_phaseSpeed = value;
+
+				if(_phaseSpeed < MinPhaseSpeed)
+				{
+					_phaseSpeed = MinPhaseSpeed;
+				}
+
+				if(_phaseSpeed > MaxPhaseSpeed)
+				{
+					_phaseSpeed = MaxPhaseSpeed;
+				}
+			}
+		}
+
 		public int RandomSeed { get; protected set; }
 
 		public int Width { get; protected set; }
 		public int Height { get; protected set; }
+		
+		public int IterationTime { get; protected set; }
+		public int FrameTime { get; protected set; }
 
 		public Daseffect()
 		{
@@ -160,6 +184,7 @@ namespace Simple_2D_Landscape.LandscapeEngine
 
 			CorruptionRate = DefaultCorruptionRate;
 			WaterLevel = DefaultWaterLevel;
+			PhaseSpeed = DefaultPhaseSpeed;
 
 			Width = width;
 			Height = height;
@@ -202,6 +227,7 @@ namespace Simple_2D_Landscape.LandscapeEngine
 
 			CorruptionRate = DefaultCorruptionRate;
 			WaterLevel = DefaultWaterLevel;
+			PhaseSpeed = DefaultPhaseSpeed;
 
 			RandomSeed = 0;
 
@@ -218,7 +244,12 @@ namespace Simple_2D_Landscape.LandscapeEngine
 				return null;
 			}
 
-			var x = GetFrame();
+			FrameTime = GetFrame();
+
+			if(FrameTime < 0)
+			{
+				return null;
+			}
 
 			Bitmap bitmap = new Bitmap(Width, Height);
 
@@ -240,6 +271,18 @@ namespace Simple_2D_Landscape.LandscapeEngine
 			GC.Collect();
 
 			return bitmap;
+		}
+
+		public int Iteration()
+		{
+			if(!IsValid())
+			{
+				return -1;
+			}
+
+			IterationTime = CudaCalc(PhaseSpeed);
+
+			return IterationTime;
 		}
 
 		private int GetFrame()
