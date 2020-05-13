@@ -9,12 +9,7 @@ using System.Windows.Forms;
 
 namespace Simple_2D_Landscape.LandscapeEngine
 {
-	public interface IBitmapable
-	{
-		Bitmap GetBitmap();
-	}
-
-	public class Daseffect : IBitmapable, IDisposable
+	public class Daseffect : IDisposable
 	{
 		protected Random _random;
 
@@ -244,7 +239,7 @@ namespace Simple_2D_Landscape.LandscapeEngine
 				return null;
 			}
 
-			FrameTime = GetFrame();
+			FrameTime = GetCurrentFrame(_buffer, 0, WaterLevel);
 
 			if(FrameTime < 0)
 			{
@@ -280,14 +275,7 @@ namespace Simple_2D_Landscape.LandscapeEngine
 				return -1;
 			}
 
-			IterationTime = CudaCalc(PhaseSpeed);
-
-			return IterationTime;
-		}
-
-		private float GetFrame()
-		{
-			return GetCurrentFrame(_buffer, 0, WaterLevel);
+			return IterationTime = CudaCalc(PhaseSpeed);
 		}
 	}
 }
