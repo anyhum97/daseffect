@@ -29,7 +29,10 @@ namespace Simple_2D_Landscape.LandscapeEngine
 		private float _bufferSum;
 
 		[DllImport(@"Cuda Implementation.dll")]
-		public static extern int test(int value);
+		public static extern int CudaStart(int width, int height);
+
+		[DllImport(@"Cuda Implementation.dll")]
+		public static extern float CudaCalc();
 
 		/// <summary>
 		/// Shows Should Metrics be Recalculated;
@@ -112,7 +115,8 @@ namespace Simple_2D_Landscape.LandscapeEngine
 		{
 			// Minimum Buffer Size is [3][3][3];
 
-			var x = test(1);
+			var x = CudaStart(16, 16);
+			var y = CudaCalc();
 
 			if(width < 3 || height < 3)
 			{
