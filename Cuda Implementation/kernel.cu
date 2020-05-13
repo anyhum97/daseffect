@@ -139,14 +139,29 @@ __global__ void CudaSample(float* Buffer,
 		                    Buffer[GetBufferIndex(1, block, thread-1, Width, Height)] - 4.0f * 
 		                    Buffer[GetBufferIndex(1, block, thread, Width, Height)];
 
-	Buffer[GetBufferIndex(2, block, thread, Width, Height)] = 2.0f*Buffer[GetBufferIndex(1, block, thread, Width, Height)] + phaseSpeed*laplacian;
+	Buffer[GetBufferIndex(2, block, thread, Width, Height)] = 2.0f*Buffer[GetBufferIndex(1, block, thread, Width, Height)] - 
+
+	Buffer[GetBufferIndex(0, block, thread, Width, Height)] + phaseSpeed*laplacian;
 }
 
-__global__ void PushBuffers(float* Buffer)
+__global__ void PushBuffer(float* Buffer, 
+						    const unsigned int Width, 
+						    const unsigned int Height)
 {
-	///	<<<1, 1>>>
+	///	<<<Width, Height>>>
 
+    const unsigned int block = blockIdx.x;
+    const unsigned int thread = threadIdx.x;
 
+    if(block >= Width || thread >= Height)
+    {
+        return;
+    }
+
+	////////////////////////////////////////////////////////////////////////
+
+	Buffer[GetBufferIndex(0, block, thread, Width, Height)] = Buffer[GetBufferIndex(1, block, thread, Width, Height)];
+	Buffer[GetBufferIndex(1, block, thread, Width, Height)] = Buffer[GetBufferIndex(2, block, thread, Width, Height)];
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -462,7 +477,7 @@ int GetCurrentFrame(int* frame, int ColorInterpretatorIndex, float WaterLevel)
 
 	memcpy(frame, Host(Frame), Frame.size);
 
-	return Frame.size;
+	return (int)(time+0.5f);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -488,6 +503,8 @@ int CudaCalc(float phaseSpeed)
 	if(Height <= 1024)
 	{
 		CudaSample<<<Width, Height>>>(Device(Buffer), Width, Height, phaseSpeed);
+
+		PushBuffer<<<Width, Height>>>(Device(Buffer), Width, Height);
 	}
 
 	////////////////////////////////////////////////////////////////////////
