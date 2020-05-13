@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -26,6 +27,9 @@ namespace Simple_2D_Landscape.LandscapeEngine
 		private float _bufferMinValue;
 		private float _bufferMaxValue;
 		private float _bufferSum;
+
+		[DllImport(@"Cuda Implementation.dll")]
+		public static extern int test(int value);
 
 		/// <summary>
 		/// Shows Should Metrics be Recalculated;
@@ -106,7 +110,9 @@ namespace Simple_2D_Landscape.LandscapeEngine
 			             double corruptionRate = DefaultCorruptionRate, 
 						 ColorInterpretationType colorInterpretator = ColorInterpretationType.Default)
 		{
-			// Minimus Buffer Size is [3][3][3];
+			// Minimum Buffer Size is [3][3][3];
+
+			var x = test(1);
 
 			if(width < 3 || height < 3)
 			{
