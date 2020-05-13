@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Simple 2D Landscape", "Simp
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Cuda Implementation", "Cuda Implementation\Cuda Implementation.vcxproj", "{EDC82FF0-9D4E-4BB2-9988-A97EAC7B5CE4}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "User Interface", "User Interface\User Interface.csproj", "{FD27CA4B-2F2F-469F-955B-8D09DDEAA550}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -29,6 +31,14 @@ Global
 		{EDC82FF0-9D4E-4BB2-9988-A97EAC7B5CE4}.Release|Any CPU.ActiveCfg = Release|x64
 		{EDC82FF0-9D4E-4BB2-9988-A97EAC7B5CE4}.Release|x64.ActiveCfg = Release|x64
 		{EDC82FF0-9D4E-4BB2-9988-A97EAC7B5CE4}.Release|x64.Build.0 = Release|x64
+		{FD27CA4B-2F2F-469F-955B-8D09DDEAA550}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FD27CA4B-2F2F-469F-955B-8D09DDEAA550}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FD27CA4B-2F2F-469F-955B-8D09DDEAA550}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{FD27CA4B-2F2F-469F-955B-8D09DDEAA550}.Debug|x64.Build.0 = Debug|Any CPU
+		{FD27CA4B-2F2F-469F-955B-8D09DDEAA550}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FD27CA4B-2F2F-469F-955B-8D09DDEAA550}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FD27CA4B-2F2F-469F-955B-8D09DDEAA550}.Release|x64.ActiveCfg = Release|Any CPU
+		{FD27CA4B-2F2F-469F-955B-8D09DDEAA550}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
