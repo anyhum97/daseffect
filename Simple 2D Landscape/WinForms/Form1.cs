@@ -56,7 +56,11 @@ namespace Simple_2D_Landscape
         {
             _timer = new Timer();
 
+<<<<<<< Updated upstream
             _timer.Interval = 25;
+=======
+            _timer.Interval = 50;
+>>>>>>> Stashed changes
             _timer.Enabled = false;
 
             _timer.Tick += new EventHandler(CalcTimerProcessor);
