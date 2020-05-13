@@ -15,6 +15,7 @@ static bool IsLoaded = false;
 ////////////////////////////////////////////////////////////////////////
 
 static Reflection<float> Buffer;
+static Reflection<float> Frame;
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -72,6 +73,8 @@ static void CudaMalloc(int Width, int Height)
 	cudaSetDevice(0);
 
 	Buffer = Malloc<float>(3*Width*Height);
+
+	Frame = Malloc<float>(Width*Height);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -81,6 +84,7 @@ extern "C" __declspec(dllexport)
 void CudaFree()
 {
 	Free(Buffer);
+	Free(Frame);
 
 	IsLoaded = false;
 }
@@ -104,6 +108,56 @@ int CudaStart(int width, int height)
 	IsLoaded = true;
 
 	return IsValid(Buffer);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+extern "C" __declspec(dllexport)
+
+bool CudaSetState(float* input, int width, int height)
+{
+	if(input == nullptr || width < 3 || height < 3)
+	{
+		return false;
+	}
+
+	if(width != Width || height != Height)
+	{
+		CudaStart(width, height);
+	}
+
+	if(!IsValid(Buffer))
+	{
+		return false;
+	}
+
+	const unsigned int size = 2*width*height*sizeof(float);
+
+	memcpy(Host(Buffer), input, size);
+
+	return Send(Buffer);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+extern "C" __declspec(dllexport)
+
+bool GetCurrentFrame(float* frame)
+{
+	Frame.host[0] = 1.23f;
+	Frame.host[1] = -2.25f;
+	Frame.host[2] = 7.14f;
+
+	Send(Frame);
+
+	if(Receive(Frame))
+	{
+		memcpy(frame, Host(Frame), Frame.size);
+
+		return true;
+	}
+
+	return false;
 }
 
 ////////////////////////////////////////////////////////////////////////

@@ -14,7 +14,7 @@ namespace Simple_2D_Landscape.LandscapeEngine
 		Bitmap GetBitmap();
 	}
 
-	public class daseffect : ColorCollection, IBitmapable
+	public class daseffect : ColorCollection, IBitmapable, IDisposable
 	{
 		private float[][][] Buffer { get; set; }	// [Dimensions][Width][Height];
 
@@ -28,11 +28,22 @@ namespace Simple_2D_Landscape.LandscapeEngine
 		private float _bufferMaxValue;
 		private float _bufferSum;
 
+		private unsafe readonly struct Data
+		{
+			public readonly float* buffer;
+		}
+
 		[DllImport(@"Cuda Implementation.dll")]
 		public static extern int CudaStart(int width, int height);
 
 		[DllImport(@"Cuda Implementation.dll")]
+		public static extern void CudaFree();
+
+		[DllImport(@"Cuda Implementation.dll")]
 		public static extern float CudaCalc();
+		
+		[DllImport(@"Cuda Implementation.dll", CallingConvention = CallingConvention.Cdecl)]
+		public static extern bool GetCurrentFrame([In, Out] float[] frame);
 
 		/// <summary>
 		/// Shows Should Metrics be Recalculated;
@@ -117,6 +128,10 @@ namespace Simple_2D_Landscape.LandscapeEngine
 
 			var x = CudaStart(16, 16);
 			var y = CudaCalc();
+			
+			float[] frame = new float[1024];
+
+			var z = GetCurrentFrame(frame);
 
 			if(width < 3 || height < 3)
 			{
@@ -171,6 +186,11 @@ namespace Simple_2D_Landscape.LandscapeEngine
 
 			ReCount = true;
 			Ready = true;
+		}
+
+		public void Dispose()
+		{
+			CudaFree();
 		}
 
 		private static int CoordinateConvertor(int value, int border)
