@@ -18,7 +18,7 @@ static cudaEvent_t stop;
 ////////////////////////////////////////////////////////////////////////
 
 static Reflection<float> Buffer;
-static Reflection<float> Frame;
+static Reflection<int> Frame;
 
 static Reflection<float> MaxValueBuffer;
 static Reflection<float> MinValueBuffer;
@@ -38,7 +38,7 @@ __inline__ __device__ int Color(const int R, const int G, const int B)
 
 ////////////////////////////////////////////////////////////////////////
 
-__inline__ __device__ unsigned int GetBufferIndex(const unsigned int dim, int x, int y, const unsigned int Width, const unsigned int Height)
+__inline__ __host__ __device__ unsigned int GetBufferIndex(const unsigned int dim, int x, int y, const unsigned int Width, const unsigned int Height)
 {
     if(x < 0)
 	{
@@ -237,7 +237,7 @@ __global__ void ReCountPart2(float* Buffer,
 ////////////////////////////////////////////////////////////////////////
 
 __global__ void CudaFrame(float* Buffer, 
-						  float* Frame,
+						  int* Frame,
 						  float* MaxValue, 
 						  float* MinValue, 
 						  ColorInterpretator Interpretator,
@@ -288,7 +288,7 @@ static void CudaMalloc(int Width, int Height)
 
 	Buffer = Malloc<float>(3*Width*Height);
 
-	Frame = Malloc<float>(Width*Height);
+	Frame = Malloc<int>(Width*Height);
 
 	MaxValueBuffer = Malloc<float>(Width);
 	MinValueBuffer = Malloc<float>(Width);
@@ -322,11 +322,16 @@ void CudaFree()
 
 extern "C" __declspec(dllexport)
 
-int CudaStart(int width, int height)
+bool CudaStart(int width, int height)
 {
 	if(IsLoaded)
 	{
 		CudaFree();
+	}
+
+	if(width < 3 || height < 3 || height > 1024)
+	{
+		return false;
 	}
 
 	Width = width;
@@ -355,7 +360,7 @@ bool CudaSetState(float* buffer, int width, int height)
 		CudaStart(width, height);
 	}
 
-	if(!IsValid(Buffer))
+	if(!IsValid(Buffer) || !IsLoaded)
 	{
 		return false;
 	}
@@ -371,7 +376,24 @@ bool CudaSetState(float* buffer, int width, int height)
 
 extern "C" __declspec(dllexport)
 
-int GetCurrentFrame(float* frame, int ColorInterpretatorIndex, float WaterLevel)
+bool SetDefaultState()
+{
+	if(!IsValid(Buffer) || !IsLoaded)
+	{
+		return false;
+	}
+
+	Host(Buffer)[GetBufferIndex(0, Width >> 1, Height >> 1, Width, Height)] = 1.0f;
+	Host(Buffer)[GetBufferIndex(1, Width >> 1, Height >> 1, Width, Height)] = 1.0f;
+
+	return Send(Buffer);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+extern "C" __declspec(dllexport)
+
+int GetCurrentFrame(int* frame, int ColorInterpretatorIndex, float WaterLevel)
 {
 	if(!IsLoaded || !IsValid(Buffer) || !IsValid(Frame))
 	{
@@ -416,8 +438,6 @@ int GetCurrentFrame(float* frame, int ColorInterpretatorIndex, float WaterLevel)
 		return -1;
 	}
 
-	memcpy(frame, Host(Frame), Frame.size);
-
 	cudaEventRecord(stop, 0);
 	cudaEventSynchronize(stop);
 
@@ -427,6 +447,8 @@ int GetCurrentFrame(float* frame, int ColorInterpretatorIndex, float WaterLevel)
 
 	cudaEventDestroy(start);
 	cudaEventDestroy(stop);
+
+	memcpy(frame, Host(Frame), Frame.size);
 
 	return (int)(time+0.5f);
 }
@@ -498,7 +520,34 @@ int GetColorInterpretatorTitle(char* str, int ColorInterpretatorIndex)
 
 ////////////////////////////////////////////////////////////////////////
 
-extern "C" __declspec(dllexport) float GetSum()
+extern "C" __declspec(dllexport)
+
+bool GetCudaStatus(int width, int height)
+{
+	bool Status = IsLoaded;
+
+	Status = Status && IsValid(Buffer);
+	Status = Status && IsValid(Frame);
+
+	Status = Status && IsValid(MaxValueBuffer);
+	Status = Status && IsValid(MinValueBuffer);
+	Status = Status && IsValid(SumBuffer);
+
+	Status = Status && IsValid(MaxValue);
+	Status = Status && IsValid(MinValue);
+	Status = Status && IsValid(Sum);
+
+	Status = Status && width == Width;
+	Status = Status && height == Height;
+
+	return Status;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+extern "C" __declspec(dllexport) 
+
+float GetSum()
 {
 	if(Receive(Sum))
 	{
@@ -508,7 +557,7 @@ extern "C" __declspec(dllexport) float GetSum()
 	return 0.0f;
 }
 
-
+////////////////////////////////////////////////////////////////////////
 
 
 

@@ -10,7 +10,7 @@ namespace Simple_2D_Landscape
 {
 	public partial class Form1 : Form
 	{
-        private daseffect _daseffect;
+        private Daseffect _daseffect;
 
         private Timer _timer;
 
@@ -39,17 +39,9 @@ namespace Simple_2D_Landscape
 
         private void InitializePhysicalModel()
         {
-            _daseffect = new daseffect(256, 256);
-            
-            _daseffect.AddNoise(0.0001f, 0.001f, 0.01f);
-            _daseffect.AddNoise(0.5f, 1.0f, 0.001f);
-             
-            //_daseffect.Set(0, _daseffect.Width >> 1, _daseffect.Height >> 1, 2.0f);
-            //_daseffect.Set(1, _daseffect.Width >> 1, _daseffect.Height >> 1, 2.0f);
+            _daseffect = new Daseffect(256, 256);
 
-            _daseffect.CurrentColorInterpretator = ColorInterpretationType.Fog;
-
-            SetPicture(_daseffect.GetBitmap());
+           pictureBox1.Image = _daseffect.GetBitmap();
         }
 
         private void InitializeTimer()
@@ -66,11 +58,11 @@ namespace Simple_2D_Landscape
         {
             trackBar1.ValueChanged += TrackBar1_ValueChanged;
 
-            trackBar1.Value = (int)(Math.Round(trackBar1.Maximum*_daseffect.WaterLevel / daseffect.MaxWaterLevel));
+            trackBar1.Value = (int)(Math.Round(trackBar1.Maximum*_daseffect.WaterLevel / Daseffect.MaxWaterLevel));
 
             comboBox1.DataSource =  Enum.GetValues(typeof(ColorInterpretationType));
 
-            comboBox1.SelectedItem = _daseffect.CurrentColorInterpretator;
+            //comboBox1.SelectedItem = _daseffect.CurrentColorInterpretator;
 
             comboBox1.SelectedValueChanged += ComboBox1_SelectedValueChanged;
 
@@ -79,9 +71,9 @@ namespace Simple_2D_Landscape
 
         private void ComboBox1_SelectedValueChanged(object sender, EventArgs e)
         {
-            _daseffect.CurrentColorInterpretator = (ColorInterpretationType)comboBox1.SelectedItem;
+            //_daseffect.CurrentColorInterpretator = (ColorInterpretationType)comboBox1.SelectedItem;
 
-            SetPicture(_daseffect.GetBitmap());
+            //SetPicture(_daseffect.GetBitmap());
         }
 
         private void TrackBar1_ValueChanged(object sender, EventArgs e)
@@ -106,7 +98,7 @@ namespace Simple_2D_Landscape
             Stopwatch sw = new Stopwatch();
 
             sw.Start();
-            _daseffect.IterationOptimazed();
+            //_daseffect.IterationOptimazed();
             SetPicture(_daseffect.GetBitmap());
             sw.Stop();
             
@@ -120,7 +112,7 @@ namespace Simple_2D_Landscape
 
         private void button7_Click(object sender, EventArgs e)
         {
-            _daseffect.IterationOptimazed();
+            //_daseffect.IterationOptimazed();
             SetPicture(_daseffect.GetBitmap());
         }
 
