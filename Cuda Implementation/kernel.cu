@@ -420,7 +420,7 @@ bool SetDefaultState()
 
 extern "C" __declspec(dllexport)
 
-int GetCurrentFrame(int* frame, int ColorInterpretatorIndex, float WaterLevel)
+float GetCurrentFrame(int* frame, int ColorInterpretatorIndex, float WaterLevel)
 {
 	if(!IsLoaded || !IsValid(Buffer) || !IsValid(Frame))
 	{
@@ -477,14 +477,14 @@ int GetCurrentFrame(int* frame, int ColorInterpretatorIndex, float WaterLevel)
 
 	memcpy(frame, Host(Frame), Frame.size);
 
-	return (int)(time+0.5f);
+	return time;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 extern "C" __declspec(dllexport)
 
-int CudaCalc(float phaseSpeed)
+float CudaCalc(float phaseSpeed)
 {
 	if(!IsLoaded || !IsValid(Buffer) || !IsValid(Frame))
 	{
@@ -519,7 +519,7 @@ int CudaCalc(float phaseSpeed)
 	cudaEventDestroy(start);
 	cudaEventDestroy(stop);
 
-	return (int)(time+0.5f);
+	return time;
 }
 
 ////////////////////////////////////////////////////////////////////////

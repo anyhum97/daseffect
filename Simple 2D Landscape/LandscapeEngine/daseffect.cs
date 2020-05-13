@@ -42,10 +42,10 @@ namespace Simple_2D_Landscape.LandscapeEngine
 		private static extern bool SetDefaultState();
 
 		[DllImport(@"Cuda Implementation.dll")]
-		private static extern int CudaCalc(float phaseSpeed);
+		private static extern float CudaCalc(float phaseSpeed);
 		
 		[DllImport(@"Cuda Implementation.dll", CallingConvention = CallingConvention.Cdecl)]
-		private static extern int GetCurrentFrame([In, Out] int[] frame, int ColorInterpretatorIndex, float WaterLevel);
+		private static extern float GetCurrentFrame([In, Out] int[] frame, int ColorInterpretatorIndex, float WaterLevel);
 
 		[DllImport(@"Cuda Implementation.dll", CallingConvention = CallingConvention.Cdecl)]
 		private static extern int GetColorInterpretatorTitle([In, Out] StringBuilder str, int ColorInterpretatorIndex);
@@ -135,8 +135,8 @@ namespace Simple_2D_Landscape.LandscapeEngine
 		public int Width { get; protected set; }
 		public int Height { get; protected set; }
 		
-		public int IterationTime { get; protected set; }
-		public int FrameTime { get; protected set; }
+		public float IterationTime { get; protected set; }
+		public float FrameTime { get; protected set; }
 
 		public Daseffect()
 		{
@@ -273,7 +273,7 @@ namespace Simple_2D_Landscape.LandscapeEngine
 			return bitmap;
 		}
 
-		public int Iteration()
+		public float Iteration()
 		{
 			if(!IsValid())
 			{
@@ -285,7 +285,7 @@ namespace Simple_2D_Landscape.LandscapeEngine
 			return IterationTime;
 		}
 
-		private int GetFrame()
+		private float GetFrame()
 		{
 			return GetCurrentFrame(_buffer, 0, WaterLevel);
 		}

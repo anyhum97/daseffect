@@ -39,17 +39,17 @@ namespace Simple_2D_Landscape
 
         private void InitializePhysicalModel()
         {
-            _daseffect = new Daseffect(256, 256);
-            SetPicture(_daseffect.GetBitmap());
+            _daseffect = new Daseffect(512, 512);
+            //SetPicture(_daseffect.GetBitmap());
 
-           //pictureBox1.Image = _daseffect.GetBitmap();
+           pictureBox1.Image = _daseffect.GetBitmap();
         }
 
         private void InitializeTimer()
         {
             _timer = new Timer();
 
-            _timer.Interval = 40;
+            _timer.Interval = 100;
             _timer.Enabled = false;
 
             _timer.Tick += new EventHandler(CalcTimerProcessor);
@@ -100,9 +100,9 @@ namespace Simple_2D_Landscape
 
             sw.Start();
             _daseffect.Iteration();
-            //pictureBox1.Image = _daseffect.GetBitmap();
+            pictureBox1.Image = _daseffect.GetBitmap();
             //_daseffect.IterationOptimazed();
-            SetPicture(_daseffect.GetBitmap());
+            //SetPicture(_daseffect.GetBitmap());
             sw.Stop();
             
             long calcTime = sw.ElapsedMilliseconds;
