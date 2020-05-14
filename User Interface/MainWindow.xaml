@@ -4,23 +4,20 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:User_Interface"
-        mc:Ignorable="d"
+		
+		xmlns:opentk="clr-namespace:OpenTK;assembly=OpenTK.GLControl" ResizeMode="CanMinimize"
+        
+		mc:Ignorable="d"
         Title="MainWindow" Height="640" Width="820">
 	<Grid>
 		<Grid.ColumnDefinitions>
 			<ColumnDefinition Width="29*"/>
 			<ColumnDefinition Width="169*"/>
 		</Grid.ColumnDefinitions>
-		
-		<Image Name="MainImage" 
-			   HorizontalAlignment="Left"
-			   VerticalAlignment="Top"  
-			   Margin="0,24,0,0" 
-			   Grid.Column="1"
-			   Stretch="UniformToFill"
-			   RenderOptions.BitmapScalingMode="NearestNeighbor"
-			   Width="512" 
-			   Height="512" />
+
+		<WindowsFormsHost Width="400" Height="400" Margin="10" Initialized="WindowsFormsHost_Initialized">
+			<opentk:GLControl x:Name="renderCanvas" Load="renderCanvas_Load" Paint="renderCanvas_Paint" />
+		</WindowsFormsHost>
 
 	</Grid>
 </Window>
