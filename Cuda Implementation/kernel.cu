@@ -517,7 +517,7 @@ float GetCurrentFrame(int* frame, int ColorInterpretatorIndex, float WaterLevel)
 
 extern "C" __declspec(dllexport)
 
-float CudaCalc(float phaseSpeed)
+float CudaCalc(float phaseSpeed, int ticks)
 {
 	if(!IsLoaded || !IsValid(Buffer) || !IsValid(Frame))
 	{
@@ -535,9 +535,12 @@ float CudaCalc(float phaseSpeed)
 
 	if(Height <= 1024)
 	{
-		CudaSample<<<Width, Height>>>(Device(Buffer), Width, Height, phaseSpeed);
+		for(int i=0; i<ticks; ++i)
+		{
+			CudaSample<<<Width, Height>>>(Device(Buffer), Width, Height, phaseSpeed);
 
-		PushBuffer<<<Width, Height>>>(Device(Buffer), Width, Height);
+			PushBuffer<<<Width, Height>>>(Device(Buffer), Width, Height);
+		}
 	}
 
 	////////////////////////////////////////////////////////////////////////

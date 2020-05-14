@@ -117,7 +117,7 @@ namespace User_Interface
 		/// Provide one tick of physical model.
 		/// </summary>
 		/// <returns></returns>
-		public abstract float Iteration();
+		public abstract float Iteration(int Ticks);
 		
 		public abstract void Set(int dim, int x, int y, float value);
 	}

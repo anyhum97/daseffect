@@ -354,17 +354,20 @@ namespace User_Interface
 			ReCount = true;
 		}
 
-		public override float Iteration()
+		public override float Iteration(int ticks)
 		{
-			if(Optimazed)
+			for(int i=0; i<ticks; ++i)
 			{
-				IterationOptimazed();
+				if(Optimazed)
+				{
+					IterationOptimazed();
+				}
+				else
+				{
+					СycleIteration();				
+				}
 			}
-			else
-			{
-				СycleIteration();				
-			}
-			
+
 			return 1.0f;
 		}
 
@@ -373,7 +376,9 @@ namespace User_Interface
 			// This Methode Performs one Iteration of Physical Calculations
 			
 			if(!IsValid())
+			{
 				return;
+			}
 			
 			/////////////////////////////********Original Physical Model********////////////////////////////
 
@@ -461,7 +466,9 @@ namespace User_Interface
 			// This Methode Performs one Iteration of Physical Calculations
 			
 			if(!IsValid())
+			{
 				return;
+			}
 
 			////////////////////////////////////////////////////////////////////////////////////////////////
 

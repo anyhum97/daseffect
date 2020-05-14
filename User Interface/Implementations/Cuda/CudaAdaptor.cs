@@ -35,7 +35,7 @@ namespace User_Interface
 		private static extern bool SetDefaultState();
 
 		[DllImport(@"Cuda Implementation.dll")]
-		private static extern float CudaCalc(float phaseSpeed);
+		private static extern float CudaCalc(float phaseSpeed, int ticks);
 		
 		[DllImport(@"Cuda Implementation.dll", CallingConvention = CallingConvention.Cdecl)]
 		private static extern float GetCurrentFrame([In, Out] int[] frame, int ColorInterpretatorIndex, float WaterLevel);
@@ -184,14 +184,19 @@ namespace User_Interface
 			return bitmap;
 		}
 
-		public override float Iteration()
+		public override float Iteration(int ticks)
 		{
 			if(!IsValid())
 			{
 				return -1;
 			}
 
-			return IterationTime = CudaCalc(PhaseSpeed);
+			if(ticks < 1)
+			{
+				ticks = 1;
+			}
+
+			return IterationTime = CudaCalc(PhaseSpeed, ticks);
 		}
 
 		public override void Set(int dim, int x, int y, float value)
