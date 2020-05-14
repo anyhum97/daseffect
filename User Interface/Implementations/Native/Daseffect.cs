@@ -272,7 +272,9 @@ namespace User_Interface
 		public override Bitmap GetBitmap()
 		{
 			if(!IsValid())
+			{
 				return null;
+			}
 
 			Bitmap bitmap = new Bitmap(Width, Height);
 
@@ -286,7 +288,7 @@ namespace User_Interface
 				}
 			}
 
-			GC.Collect();
+			//GC.Collect();
 
 			return bitmap;
 		}

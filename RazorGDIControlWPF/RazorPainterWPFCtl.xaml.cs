@@ -17,7 +17,7 @@ namespace RazorGDIControlWPF
 		/// <summary>
 		/// root Bitmap
 		/// </summary>
-		public System.Drawing.Bitmap RazorBMP { get; private set; }
+		public System.Drawing.Bitmap RazorBMP { get; set; }
 
 		/// <summary>
 		/// Graphics object to paint on RazorBMP

@@ -4,17 +4,23 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         
-		xmlns:RazorGDIControlWPF="clr-namespace:RazorGDIControlWPF;assembly=RazorGDIControlWPF" Loaded="Window_Loaded_1" Closing="Window_Closing_1"
+		xmlns:RazorGDIControlWPF="clr-namespace:RazorGDIControlWPF;assembly=RazorGDIControlWPF"
 		
 		xmlns:local="clr-namespace:User_Interface"
         mc:Ignorable="d"
-        Title="MainWindow" Height="640" Width="820">
-	<Grid>
+        Title="MainWindow" Height="1366" Width="1280">
+
+	<Grid Margin="399,-27,-399,27">
+		<Grid.RowDefinitions>
+			<RowDefinition Height="36*"/>
+			<RowDefinition Height="53*"/>
+		</Grid.RowDefinitions>
 		<Grid.ColumnDefinitions>
 			<ColumnDefinition Width="29*"/>
 			<ColumnDefinition Width="169*"/>
 		</Grid.ColumnDefinitions>
 
-		<RazorGDIControlWPF:RazorPainterWPFCtl x:Name="razorPainterWPFCtl1" Margin="10"/>
+		<RazorGDIControlWPF:RazorPainterWPFCtl x:Name="razorPainterWPFCtl1" Margin="-389,38,63,785" Width="512" Height="512" Grid.RowSpan="2"/>
+		<Label Name ="Label1" Content="" HorizontalAlignment="Left" Margin="-380,49,0,0" VerticalAlignment="Top" Width="66"/>
 	</Grid>
 </Window>
