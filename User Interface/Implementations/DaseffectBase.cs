@@ -109,8 +109,6 @@ namespace User_Interface
 
 		public abstract bool IsValid();
 
-
-
 		public abstract Bitmap GetBitmap();
 
 		/// <summary>

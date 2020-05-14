@@ -3,24 +3,16 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+		xmlns:wpf="clr-namespace:SharpGL.WPF;assembly=SharpGL.WPF"
         xmlns:local="clr-namespace:User_Interface"
         mc:Ignorable="d"
         Title="MainWindow" Height="640" Width="820">
+	
 	<Grid>
-		<Grid.ColumnDefinitions>
-			<ColumnDefinition Width="29*"/>
-			<ColumnDefinition Width="169*"/>
-		</Grid.ColumnDefinitions>
-		
-		<Image Name="MainImage" 
-			   HorizontalAlignment="Left"
-			   VerticalAlignment="Top"  
-			   Margin="0,24,0,0" 
-			   Grid.Column="1"
-			   Stretch="UniformToFill"
-			   RenderOptions.BitmapScalingMode="NearestNeighbor"
-			   Width="512" 
-			   Height="512" />
-
+		<wpf:OpenGLControl OpenGLDraw="OpenGLControl_OpenGLDraw"
+                               OpenGLInitialized="OpenGLControl_OpenGLInitialized"
+                               Resized="OpenGLControl_Resized"
+                               DrawFPS="True"/>
 	</Grid>
+	
 </Window>

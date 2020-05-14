@@ -1,4 +1,6 @@
-﻿using System;
+﻿using SharpGL;
+using SharpGL.SceneGraph;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
@@ -17,9 +19,6 @@ using System.Windows.Shapes;
 
 namespace User_Interface
 {
-	/// <summary>
-	/// Логика взаимодействия для MainWindow.xaml
-	/// </summary>
 	public partial class MainWindow : Window
 	{
 		internal static ImageSource ImageToByte(Bitmap bitmap)
@@ -41,7 +40,7 @@ namespace User_Interface
 
 			daseffect.Set(1, 128, 128, 1.0f);
 
-			MainImage.Source = ImageToByte(daseffect.GetBitmap());
+			//MainImage.Source = ImageToByte(daseffect.GetBitmap());
 
 			Timer timer = new Timer();
 
@@ -50,9 +49,32 @@ namespace User_Interface
 			timer.Start();
 		}
 
+		private void OpenGLControl_OpenGLInitialized(object sender, OpenGLEventArgs args)
+		{
+			var gl = args.OpenGL;
+			gl.ClearColor(0.3f, 0.3f, 0.3f, 0.3f);
+		}
+
+		private void OpenGLControl_OpenGLDraw(object sender, OpenGLEventArgs args)
+		{
+			var gl = args.OpenGL;
+			gl.Clear(OpenGL.GL_COLOR_BUFFER_BIT | OpenGL.GL_DEPTH_BUFFER_BIT);
+			gl.Begin(OpenGL.GL_TRIANGLES);
+			gl.Color(0f, 1f, 0f);
+			gl.Vertex(-1f, -1f);
+			gl.Vertex(0f, 1f);
+			gl.Vertex(1f, -1f);
+			gl.End();
+		}
+
+		private void OpenGLControl_Resized(object sender, OpenGLEventArgs args)
+		{
+
+		}
+
 		private void Timer_Elapsed(object sender, ElapsedEventArgs e)
 		{
-			daseffect.Iteration();
+			//daseffect.Iteration();
 			//MainImage.Source = ImageToByte(daseffect.GetBitmap());
 		}
 	}
