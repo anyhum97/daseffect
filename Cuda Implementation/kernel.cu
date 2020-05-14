@@ -375,6 +375,39 @@ bool CudaStart(int width, int height)
 
 extern "C" __declspec(dllexport)
 
+bool CudaGetState(float* buffer, int width, int height)
+{
+	if(width < 3 || height < 3)
+	{
+		return false;
+	}
+
+	if(width != Width || height != Height)
+	{
+		return false;
+	}
+
+	if(!IsValid(Buffer) || !IsLoaded)
+	{
+		return false;
+	}
+
+	const unsigned int size = 2*width*height*sizeof(float);
+
+	if(!Receive(Buffer, size))
+	{
+		return false;
+	}
+
+	memcpy(buffer, Host(Buffer), size);
+
+	return IsValid(Buffer);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+extern "C" __declspec(dllexport)
+
 bool CudaSetState(float* buffer, int width, int height)
 {
 	if(buffer == nullptr || width < 3 || height < 3)

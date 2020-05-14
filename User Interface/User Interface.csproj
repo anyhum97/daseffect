@@ -63,7 +63,10 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="CudaAdaptor.cs" />
+    <Compile Include="Implementations\Native\ColorCollection.cs" />
+    <Compile Include="Implementations\Cuda\CudaAdaptor.cs" />
+    <Compile Include="Implementations\Native\Daseffect.cs" />
+    <Compile Include="Implementations\DaseffectBase.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
@@ -95,5 +98,6 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

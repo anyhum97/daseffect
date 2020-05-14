@@ -5,18 +5,17 @@ using System.Text;
 
 namespace User_Interface
 {
-	public class CudaAdaptor : IDisposable
+	public sealed class CudaAdaptor : DaseffectBase, IDisposable
 	{
-		protected Random _random;
+		/// <summary>
+		/// Used in frame transactions.
+		/// </summary>
+		private volatile int[] _buffer;
 
-		protected volatile int[] _buffer;
-
-		private double _corruptionRate;
-
-		private float _waterLevel;
-
-		private float _phaseSpeed;
-
+		/// <summary>
+		/// Import dll functions to use Cuda Implementation.
+		/// </summary>
+		
 		[DllImport(@"Cuda Implementation.dll")]
 		private static extern bool CudaStart(int width, int height);
 
@@ -25,6 +24,9 @@ namespace User_Interface
 
 		[DllImport(@"Cuda Implementation.dll")]
 		private static extern bool GetCudaStatus(int width, int height);
+
+		[DllImport(@"Cuda Implementation.dll", CallingConvention = CallingConvention.Cdecl)]
+		private static extern bool CudaGetState([In, Out] float[] buffer, int width, int height);
 
 		[DllImport(@"Cuda Implementation.dll", CallingConvention = CallingConvention.Cdecl)]
 		private static extern bool CudaSetState([In, Out] float[] buffer, int width, int height);
@@ -43,91 +45,9 @@ namespace User_Interface
 
 		[DllImport(@"Cuda Implementation.dll")]
 		private static extern int GetColorInterpretatorCount();
-
-		/// <summary>
-		/// Shows That the Class Instance was Successfully Initialized.
-		/// </summary>
-		public bool Ready { get; protected set; }
 		
-		public const double DefaultCorruptionRate = 0.950;
-		
-		public const double MinCorruptionRate = 0.001;
-		public const double MaxCorruptionRate = 1.000;
-
-		/// <summary>
-		/// Shows What Percentage of Points Should be Recalculated.
-		/// MinValue => MinCorruptionRate;
-		/// MaxValue => MaxCorruptionRate;
-		/// </summary>
-		public double CorruptionRate
-		{
-			get => _corruptionRate;
-			
-			set
-			{
-				_corruptionRate = value;
-
-				if(_corruptionRate < MinCorruptionRate)
-					_corruptionRate = MinCorruptionRate;
-
-				if(_corruptionRate > MaxCorruptionRate)
-					_corruptionRate = MaxCorruptionRate;
-			}
-		}
-
-		public const float DefaultWaterLevel = 0.5f;
-		
-		public const float MinWaterLevel = 0.01f;
-		public const float MaxWaterLevel = 0.99f;
-
-		public float WaterLevel
-		{
-			get => _waterLevel;
-			
-			set
-			{
-				_waterLevel = value;
-
-				if(_waterLevel < MinWaterLevel)
-					_waterLevel = MinWaterLevel;
-
-				if(_waterLevel > MaxWaterLevel)
-					_waterLevel = MaxWaterLevel;
-			}
-		}
-
-		public const float DefaultPhaseSpeed = 0.495f;
-		
-		public const float MinPhaseSpeed = 0.01f;
-		public const float MaxPhaseSpeed = 0.50f;
-
-		public float PhaseSpeed
-		{
-			get => _phaseSpeed;
-
-			set
-			{
-				_phaseSpeed = value;
-
-				if(_phaseSpeed < MinPhaseSpeed)
-				{
-					_phaseSpeed = MinPhaseSpeed;
-				}
-
-				if(_phaseSpeed > MaxPhaseSpeed)
-				{
-					_phaseSpeed = MaxPhaseSpeed;
-				}
-			}
-		}
-
-		public int RandomSeed { get; protected set; }
-
-		public int Width { get; protected set; }
-		public int Height { get; protected set; }
-		
-		public float IterationTime { get; protected set; }
-		public float FrameTime { get; protected set; }
+		public float IterationTime { get; private set; }
+		public float FrameTime { get; private set; }
 
 		public CudaAdaptor()
 		{
@@ -190,7 +110,7 @@ namespace User_Interface
 			GC.SuppressFinalize(this);
 		}
 
-		public bool IsValid()
+		public override bool IsValid()
 		{
 			if(!Ready)
 			{
@@ -228,7 +148,7 @@ namespace User_Interface
 			Ready = false;
 		}
 
-		public Bitmap GetBitmap()
+		public override Bitmap GetBitmap()
 		{
 			if(!IsValid())
 			{
@@ -264,7 +184,7 @@ namespace User_Interface
 			return bitmap;
 		}
 
-		public float Iteration()
+		public override float Iteration()
 		{
 			if(!IsValid())
 			{
@@ -272,6 +192,29 @@ namespace User_Interface
 			}
 
 			return IterationTime = CudaCalc(PhaseSpeed);
+		}
+
+		public override void Set(int dim, int x, int y, float value)
+		{
+			if(dim > 1 || x < 0 || y < 0 || x >= Width || y >= Height)
+			{
+				throw new ArgumentException();
+			}
+
+			float[] dump = new float[2*Width*Height];
+
+			CudaGetState(dump, Width, Height);
+
+			try
+			{
+				dump[dim*Width*Height+x*Height+y] = value;
+			}
+			catch
+			{
+				
+			}
+
+			CudaSetState(dump, Width, Height);
 		}
 	}
 }
