@@ -179,7 +179,7 @@ namespace User_Interface
 				}
 			}
 
-			GC.Collect();
+			//GC.Collect();
 
 			return bitmap;
 		}
