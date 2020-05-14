@@ -15,22 +15,16 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace User_Interface
 {
 	public partial class MainWindow : Window
 	{
-		internal static ImageSource ImageToByte(Bitmap bitmap)
-		{
-			return System.Windows.Interop.Imaging.CreateBitmapSourceFromHBitmap(
-			bitmap.GetHbitmap(),
-			IntPtr.Zero,
-			Int32Rect.Empty,
-			BitmapSizeOptions.FromEmptyOptions());
-		}
+        private uint[] _texture = new uint[2];
+        
+        public Daseffect daseffect { get; private set; }
 
-		private Daseffect daseffect;
+		public Bitmap CurrentBitmap { get; private set; }
 
 		public MainWindow()
 		{
@@ -40,42 +34,73 @@ namespace User_Interface
 
 			daseffect.Set(1, 128, 128, 1.0f);
 
-			//MainImage.Source = ImageToByte(daseffect.GetBitmap());
-
-			Timer timer = new Timer();
-
-			timer.Interval = 100;
-			timer.Elapsed += Timer_Elapsed;
-			timer.Start();
+			UpdateBitmap();
 		}
+
+		private void UpdateBitmap()
+		{
+			CurrentBitmap = daseffect.GetBitmap();
+		}
+
+        private uint LoadTexture(OpenGL openGL, Bitmap bitmap)
+        {
+            uint[] textur = new uint[1];
+
+            Rectangle rect = new Rectangle(0, 0, bitmap.Width, bitmap.Height);
+            
+            var bitmapdata = bitmap.LockBits(rect, System.Drawing.Imaging.ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format24bppRgb);
+            
+            openGL.GenTextures(1, textur);
+            openGL.BindTexture(OpenGL.GL_TEXTURE_2D, textur[0]);
+
+            openGL.Build2DMipmaps(OpenGL.GL_TEXTURE_2D, (int)OpenGL.GL_RGBA, bitmap.Width, bitmap.Height, OpenGL.GL_BGR_EXT, OpenGL.GL_UNSIGNED_BYTE, bitmapdata.Scan0);
+
+			openGL.TexParameter(OpenGL.GL_TEXTURE_2D, OpenGL.GL_TEXTURE_MAG_FILTER, OpenGL.GL_LINEAR);
+            //openGL.TexParameter(OpenGL.GL_TEXTURE_2D, OpenGL.GL_TEXTURE_MIN_FILTER, OpenGL.GL_LINEAR_MIPMAP_NEAREST);
+            
+            uint tex = textur[0];
+            
+            bitmap.UnlockBits(bitmapdata);
+            bitmap.Dispose();
+            
+			return tex;
+        }
 
 		private void OpenGLControl_OpenGLInitialized(object sender, OpenGLEventArgs args)
 		{
-			var gl = args.OpenGL;
-			gl.ClearColor(0.3f, 0.3f, 0.3f, 0.3f);
+			OpenGL openGL = OpenGLControl.OpenGL;
+
+			openGL.Color(1.0f, 1.0f, 1.0f);
+			
+            openGL.Enable(OpenGL.GL_TEXTURE_2D);
+			
+            _texture[0] = LoadTexture(openGL, CurrentBitmap);
 		}
 
 		private void OpenGLControl_OpenGLDraw(object sender, OpenGLEventArgs args)
 		{
-			var gl = args.OpenGL;
-			gl.Clear(OpenGL.GL_COLOR_BUFFER_BIT | OpenGL.GL_DEPTH_BUFFER_BIT);
-			gl.Begin(OpenGL.GL_TRIANGLES);
-			gl.Color(0f, 1f, 0f);
-			gl.Vertex(-1f, -1f);
-			gl.Vertex(0f, 1f);
-			gl.Vertex(1f, -1f);
-			gl.End();
+			OpenGL openGL = OpenGLControl.OpenGL;
+
+			openGL.Clear(OpenGL.GL_COLOR_BUFFER_BIT | OpenGL.GL_DEPTH_BUFFER_BIT);
+            
+            openGL.ClearColor(1.0f, 1.0f, 1.0f, 0.0f);
+
+			openGL.Begin(OpenGL.GL_QUADS);
+
+			openGL.Color(1.0f, 1.0f, 1.0f);
+
+			openGL.TexCoord(1.0f, 0.0f); openGL.Vertex(-1.0f, -1.0f, -1.0f);
+			openGL.TexCoord(1.0f, 1.0f); openGL.Vertex(-1.0f, 1.0f, -1.0f);
+			openGL.TexCoord(0.0f, 1.0f); openGL.Vertex(1.0f, 1.0f, -1.0f);
+			openGL.TexCoord(0.0f, 0.0f); openGL.Vertex(1.0f, -1.0f, -1.0f);
+            
+			openGL.End();
+			openGL.Flush();
 		}
 
 		private void OpenGLControl_Resized(object sender, OpenGLEventArgs args)
 		{
 
-		}
-
-		private void Timer_Elapsed(object sender, ElapsedEventArgs e)
-		{
-			//daseffect.Iteration();
-			//MainImage.Source = ImageToByte(daseffect.GetBitmap());
 		}
 	}
 }

@@ -12,7 +12,9 @@
 		<wpf:OpenGLControl OpenGLDraw="OpenGLControl_OpenGLDraw"
                                OpenGLInitialized="OpenGLControl_OpenGLInitialized"
                                Resized="OpenGLControl_Resized"
-                               DrawFPS="True"/>
+						       Height="512" Width="512"
+                               DrawFPS="True" Margin="10,10,290,87"
+						       Name="OpenGLControl"/>
 	</Grid>
 	
 </Window>
