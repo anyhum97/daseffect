@@ -287,6 +287,8 @@ __global__ void CudaFrame(float* Buffer,
 	Frame[GetFrameIndex(block, thread, Width, Height)] = ColorInterpretators::Interpretators[InterpretatorIndex](value, MaxValue[0], MinValue[0], WaterLevel);
 }
 
+////////////////////////////////////////////////////////////////////////
+
 void ReCount()
 {
 	ReCountPart1<<<Width, 1>>>(Device(Buffer), 
@@ -341,6 +343,11 @@ void CudaFree()
 	Free(MinValueBuffer);
 
 	Free(SumBuffer);
+
+	Free(MaxValue);
+	Free(MinValue);
+
+	Free(Sum);
 
 	IsLoaded = false;
 }

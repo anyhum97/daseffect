@@ -347,3 +347,9 @@ MigrationBackup/
 
 # Ionide (cross platform F# VS Code tools) working folder
 .ionide/
+
+# Upload Cuda Implementation.dll
+
+!\User Interface\bin\Debug\*.dll
+!\User Interface\bin\Release\*.dll
+
