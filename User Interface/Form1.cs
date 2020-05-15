@@ -23,6 +23,22 @@ namespace User_Interface
 			InitializeComponent();
 			InitializeViewModel();
 			StartTimer(80);
+
+			KeyPreview = true;
+			KeyDown += Form1_KeyDown;
+		}
+
+		private void Form1_KeyDown(object sender, KeyEventArgs e)
+		{
+			if(e.KeyCode == Keys.D1)
+			{
+				Tick();
+			}
+
+			if(e.KeyCode == Keys.D2)
+			{
+				SaveImage();
+			}
 		}
 
 		private void InitializePhysicalModel(int modelType = 0)
@@ -156,6 +172,37 @@ namespace User_Interface
 			}
 		}
 
+		private void SaveImage()
+		{
+			if(daseffect != null && daseffect.IsValid())
+			{
+				string directoryPath = daseffect.RandomSeed.ToString();
+
+				try
+				{
+					if(!Directory.Exists(directoryPath))
+					{
+						Directory.CreateDirectory(directoryPath);
+					}
+
+					string filePath = daseffect.IterationCount.ToString();
+
+					if(File.Exists(filePath))
+					{
+						File.Delete(filePath);
+					}
+
+					CurrentBitmap.Save(directoryPath + "\\" + filePath + ".png");
+
+					_lastDirectoryPath = directoryPath;
+				}
+				catch
+				{
+					MessageBox.Show("Cannot Save the Image");
+				}
+			}
+		}
+
 		private void pictureBox1_Click(object sender, EventArgs e)
 		{
 			_isRendering = !_isRendering;
@@ -217,33 +264,7 @@ namespace User_Interface
 
 		private void button4_Click(object sender, EventArgs e)
 		{
-			if(daseffect != null && daseffect.IsValid())
-			{
-				string directoryPath = daseffect.RandomSeed.ToString();
-
-				try
-				{
-					if(!Directory.Exists(directoryPath))
-					{
-						Directory.CreateDirectory(directoryPath);
-					}
-
-					string filePath = daseffect.IterationCount.ToString();
-
-					if(File.Exists(filePath))
-					{
-						File.Delete(filePath);
-					}
-
-					CurrentBitmap.Save(directoryPath + "\\" + filePath + ".png");
-
-					_lastDirectoryPath = directoryPath;
-				}
-				catch
-				{
-					MessageBox.Show("Cannot Save the Image");
-				}
-			}
+			SaveImage();
 		}
 
 		private void button3_Click(object sender, EventArgs e)
@@ -259,6 +280,15 @@ namespace User_Interface
 		private void button2_Click(object sender, EventArgs e)
 		{
 			Tick();
+		}
+
+		private void button5_Click(object sender, EventArgs e)
+		{
+			for(int i=0; i<60; ++i)
+			{
+				Tick();
+				SaveImage();
+			}
 		}
 	}
 }
