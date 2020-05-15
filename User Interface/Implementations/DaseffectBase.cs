@@ -107,6 +107,8 @@ namespace User_Interface
 		/// </summary>
 		public int Height { get; protected set; }
 		
+		public int IterationCount { get; protected set; } = 0;
+
 		public static int ColorInterpretatorCount { get; protected set; }
 
 		public int ColorInterpretatorIndex { get; protected set; } = 0;

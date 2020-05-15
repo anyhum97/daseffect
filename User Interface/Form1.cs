@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -197,6 +198,42 @@ namespace User_Interface
 		{
 			FramesPerOperation = trackBar4.Value*4;
 			textBox4.Text = FramesPerOperation.ToString();
+		}
+
+		private void button4_Click(object sender, EventArgs e)
+		{
+			if(daseffect != null && daseffect.IsValid())
+			{
+				string directoryPath = daseffect.RandomSeed.ToString();
+
+				try
+				{
+					if(!Directory.Exists(directoryPath))
+					{
+						Directory.CreateDirectory(directoryPath);
+					}
+
+					string filePath = daseffect.IterationCount.ToString();
+
+					if(File.Exists(filePath))
+					{
+						File.Delete(filePath);
+					}
+
+					CurrentBitmap.Save(directoryPath + "\\" + filePath + ".png");
+
+					_lastDirectoryPath = directoryPath;
+				}
+				catch
+				{
+					MessageBox.Show("Cannot Save the Image");
+				}
+			}
+		}
+
+		private void button3_Click(object sender, EventArgs e)
+		{
+			System.Diagnostics.Process.Start("explorer", _lastDirectoryPath);
 		}
 	}
 }

@@ -341,6 +341,13 @@ namespace User_Interface
 		{
 			var startTime = Stopwatch.StartNew();
 
+			if(!IsValid())
+			{
+				return -1.0f;
+			}
+
+			IterationCount += ticks;
+
 			for(int i=0; i<ticks; ++i)
 			{
 				if(Optimazed)
@@ -366,7 +373,7 @@ namespace User_Interface
 			{
 				return;
 			}
-			
+
 			/////////////////////////////********Original Physical Model********////////////////////////////
 
 			// Uses the Wave Equation in a Nonlinear Physical Environment.

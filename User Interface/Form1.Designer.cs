@@ -80,7 +80,7 @@
 			this.comboBox2.Location = new System.Drawing.Point(545, 96);
 			this.comboBox2.Name = "comboBox2";
 			this.comboBox2.Size = new System.Drawing.Size(144, 24);
-			this.comboBox2.TabIndex = 2;
+			this.comboBox2.TabIndex = 3;
 			this.comboBox2.SelectedIndexChanged += new System.EventHandler(this.comboBox2_SelectedIndexChanged);
 			// 
 			// comboBox1
@@ -90,7 +90,7 @@
 			this.comboBox1.Location = new System.Drawing.Point(545, 34);
 			this.comboBox1.Name = "comboBox1";
 			this.comboBox1.Size = new System.Drawing.Size(144, 24);
-			this.comboBox1.TabIndex = 3;
+			this.comboBox1.TabIndex = 2;
 			this.comboBox1.SelectedIndexChanged += new System.EventHandler(this.comboBox1_SelectedIndexChanged);
 			// 
 			// label2
@@ -121,7 +121,7 @@
 			this.trackBar1.Maximum = 20;
 			this.trackBar1.Name = "trackBar1";
 			this.trackBar1.Size = new System.Drawing.Size(144, 45);
-			this.trackBar1.TabIndex = 6;
+			this.trackBar1.TabIndex = 5;
 			this.trackBar1.Value = 19;
 			this.trackBar1.Scroll += new System.EventHandler(this.trackBar1_Scroll);
 			// 
@@ -153,7 +153,7 @@
 			this.trackBar2.Maximum = 20;
 			this.trackBar2.Name = "trackBar2";
 			this.trackBar2.Size = new System.Drawing.Size(144, 45);
-			this.trackBar2.TabIndex = 8;
+			this.trackBar2.TabIndex = 4;
 			this.trackBar2.Value = 10;
 			this.trackBar2.Scroll += new System.EventHandler(this.trackBar2_Scroll);
 			// 
@@ -174,7 +174,7 @@
 			this.trackBar3.Maximum = 20;
 			this.trackBar3.Name = "trackBar3";
 			this.trackBar3.Size = new System.Drawing.Size(144, 45);
-			this.trackBar3.TabIndex = 10;
+			this.trackBar3.TabIndex = 6;
 			this.trackBar3.Value = 20;
 			this.trackBar3.Scroll += new System.EventHandler(this.trackBar3_Scroll);
 			// 
@@ -183,46 +183,48 @@
 			this.textBox1.Location = new System.Drawing.Point(694, 169);
 			this.textBox1.Name = "textBox1";
 			this.textBox1.Size = new System.Drawing.Size(50, 20);
-			this.textBox1.TabIndex = 12;
+			this.textBox1.TabIndex = 101;
 			// 
 			// textBox2
 			// 
 			this.textBox2.Location = new System.Drawing.Point(694, 251);
 			this.textBox2.Name = "textBox2";
 			this.textBox2.Size = new System.Drawing.Size(50, 20);
-			this.textBox2.TabIndex = 13;
+			this.textBox2.TabIndex = 102;
 			// 
 			// textBox3
 			// 
 			this.textBox3.Location = new System.Drawing.Point(694, 338);
 			this.textBox3.Name = "textBox3";
 			this.textBox3.Size = new System.Drawing.Size(50, 20);
-			this.textBox3.TabIndex = 14;
+			this.textBox3.TabIndex = 103;
 			// 
 			// button3
 			// 
 			this.button3.Location = new System.Drawing.Point(654, 481);
 			this.button3.Name = "button3";
 			this.button3.Size = new System.Drawing.Size(90, 43);
-			this.button3.TabIndex = 18;
+			this.button3.TabIndex = 1;
 			this.button3.Text = "Open Folder";
 			this.button3.UseVisualStyleBackColor = true;
+			this.button3.Click += new System.EventHandler(this.button3_Click);
 			// 
 			// button4
 			// 
 			this.button4.Location = new System.Drawing.Point(543, 481);
 			this.button4.Name = "button4";
 			this.button4.Size = new System.Drawing.Size(90, 43);
-			this.button4.TabIndex = 17;
+			this.button4.TabIndex = 0;
 			this.button4.Text = "Save Image";
 			this.button4.UseVisualStyleBackColor = true;
+			this.button4.Click += new System.EventHandler(this.button4_Click);
 			// 
 			// textBox4
 			// 
 			this.textBox4.Location = new System.Drawing.Point(694, 419);
 			this.textBox4.Name = "textBox4";
 			this.textBox4.Size = new System.Drawing.Size(50, 20);
-			this.textBox4.TabIndex = 21;
+			this.textBox4.TabIndex = 104;
 			// 
 			// label7
 			// 
@@ -241,7 +243,7 @@
 			this.trackBar4.Maximum = 32;
 			this.trackBar4.Name = "trackBar4";
 			this.trackBar4.Size = new System.Drawing.Size(144, 45);
-			this.trackBar4.TabIndex = 19;
+			this.trackBar4.TabIndex = 7;
 			this.trackBar4.Value = 4;
 			this.trackBar4.Scroll += new System.EventHandler(this.trackBar4_Scroll);
 			// 

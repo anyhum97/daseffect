@@ -247,13 +247,15 @@ namespace User_Interface
 		{
 			if(!IsValid())
 			{
-				return -1;
+				return -1.0f;
 			}
 
 			if(ticks < 1)
 			{
 				ticks = 1;
 			}
+
+			IterationCount += ticks;
 
 			return IterationTime = CudaCalc(PhaseSpeed, ticks);
 		}

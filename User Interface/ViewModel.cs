@@ -9,6 +9,8 @@ namespace User_Interface
 	{
 		private Timer _timer;
 
+		private string _lastDirectoryPath = null;
+
 		private int _counter = 0;
 
 		private bool _isRendering = false;
