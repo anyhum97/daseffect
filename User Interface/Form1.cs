@@ -25,11 +25,24 @@ namespace User_Interface
 			StartTimer(80);
 		}
 
-		private void InitializePhysicalModel()
+		private void InitializePhysicalModel(int modelType = 0)
 		{
-			daseffect = new CudaAdaptor(512, 512);
+			bool saveState = _isRendering;
+
+			_isRendering = false;
+
+			if(modelType == 0)
+			{
+				daseffect = new Daseffect(512, 512);
+			}
+			else
+			{
+				daseffect = new CudaAdaptor(512, 512);
+			}
 
 			daseffect.AddNoise(0.001f, 0.1f, 0.005f);
+
+			_isRendering = saveState;
 
 			UpdateImage();
 		}
@@ -38,26 +51,8 @@ namespace User_Interface
 		{
 			label1.Text = "iteration: --";
 
-			#region ComboBox
-
-			if (daseffect != null)
-			{
-				List<string> list = daseffect.GetColorInterpretatorsTitle();
-
-				if(list != null && list.Count > 0)
-				{
-					foreach(var title in list)
-					{
-						comboBox1.Items.Add(title);
-					}
-
-					comboBox1.SelectedItem = list[0];
-				}
-			}
-
-			#endregion
-
-
+			SetComboBox1Items();
+			UpdateComboBox2Items();
 		}
 
 		private void StartTimer(int interval = 100)
@@ -110,11 +105,48 @@ namespace User_Interface
 			}
 		}
 
+		private void SetComboBox1Items()
+		{
+			comboBox1.Items.Add("CPU C#");
+			comboBox1.Items.Add("GPU Cuda C");
+			comboBox1.SelectedIndex = 0;
+		}
+
+		private void UpdateComboBox2Items()
+		{
+			if(daseffect != null)
+			{
+				List<string> list = daseffect.GetColorInterpretatorsTitle();
+
+				if(list != null && list.Count > 0)
+				{
+					foreach(var title in list)
+					{
+						comboBox2.Items.Add(title);
+					}
+
+					comboBox2.SelectedIndex = 0;
+				}
+			}
+		}
+
 		private void pictureBox1_Click(object sender, EventArgs e)
 		{
 			_isRendering = !_isRendering;
 		}
 
+		private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
+		{
+			var comboBox1 = (ComboBox)sender;
 
+			int index = comboBox1.SelectedIndex;
+
+			if(index > 1)
+			{
+				index = 1;
+			}
+
+			InitializePhysicalModel(index);
+		}
 	}
 }
