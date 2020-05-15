@@ -691,5 +691,10 @@ namespace User_Interface
 
 			ReCount = false;
 		}
+
+		public override List<string> GetColorInterpretatorsTitle()
+		{
+			return colorInterpretators;
+		}
 	}
 }

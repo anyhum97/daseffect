@@ -123,6 +123,8 @@ namespace User_Interface
 		/// </summary>
 		/// <returns></returns>
 		public abstract float Iteration(int Ticks);
+
+		public abstract List<string> GetColorInterpretatorsTitle();
 	}
 }
 

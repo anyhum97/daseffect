@@ -112,7 +112,7 @@ namespace ColorInterpretators
 
 	char* Titles[] = 
 	{
-		"DefaultColor",
+		"Default Color",
 	};
 }
 

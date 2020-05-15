@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -250,6 +251,29 @@ namespace User_Interface
 			}
 
 			return IterationTime = CudaCalc(PhaseSpeed, ticks);
+		}
+
+		public override List<string> GetColorInterpretatorsTitle()
+		{
+			List<string> list = new List<string>();
+
+			if(!IsValid())
+			{
+				return list;
+			}
+
+			int count = GetColorInterpretatorCount();
+
+			for(int i=0; i<count; ++i)
+			{
+				StringBuilder stringBuilder = new StringBuilder(32);
+
+				int len = GetColorInterpretatorTitle(stringBuilder, i);
+
+				list.Add(stringBuilder.ToString(0, len));
+			}
+
+			return list;
 		}
 	}
 }

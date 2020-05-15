@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -20,17 +21,43 @@ namespace User_Interface
 		{
 			InitializeComponent();
 			InitializePhysicalModel();
-			label1.Text = "iteration: ";
+			InitializeViewModel();
 			StartTimer(80);
 		}
 
 		private void InitializePhysicalModel()
 		{
-			daseffect = new CudaAdaptor(512, 512, 512);
+			daseffect = new CudaAdaptor(512, 512);
 
 			daseffect.AddNoise(0.001f, 0.1f, 0.005f);
 
 			UpdateImage();
+		}
+
+		private void InitializeViewModel()
+		{
+			label1.Text = "iteration: --";
+
+			#region ComboBox
+
+			if (daseffect != null)
+			{
+				List<string> list = daseffect.GetColorInterpretatorsTitle();
+
+				if(list != null && list.Count > 0)
+				{
+					foreach(var title in list)
+					{
+						comboBox1.Items.Add(title);
+					}
+
+					comboBox1.SelectedItem = list[0];
+				}
+			}
+
+			#endregion
+
+
 		}
 
 		private void StartTimer(int interval = 100)
@@ -55,6 +82,11 @@ namespace User_Interface
 			pictureBox1.Image = CurrentBitmap;
 		}
 
+		private string Float2(float value)
+		{
+			return string.Format(CultureInfo.InvariantCulture, "iteration: {0:F2} ms", value);
+		}
+
 		private void Timer_Tick(object sender, EventArgs e)
 		{
 			if(_isRendering)
@@ -63,7 +95,7 @@ namespace User_Interface
 				{
 					var time = daseffect.Iteration(FramesPerOperation);
 
-					label1.Text = string.Format("iteration: {0:F2} ms", time);
+					label1.Text = Float2(time);
 
 					UpdateImage();
 

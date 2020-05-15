@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
 
 namespace User_Interface
@@ -19,6 +20,8 @@ namespace User_Interface
 
 		protected static readonly ColorInterpretator[] _colorInterpretators;
 
+		protected static List<string> colorInterpretators;
+		
 		public ColorInterpretationType CurrentColorInterpretator { get; set; } = default;
 
 		static Daseffect()
@@ -30,8 +33,15 @@ namespace User_Interface
 				GetLandscapeColor,
 				GetWaterFlowColor,
 				GetFogColor,
-				GetPieColor,
 			};
+
+			colorInterpretators = new List<string>();
+
+			colorInterpretators.Add("Default Color");
+			colorInterpretators.Add("Boolean Color");
+			colorInterpretators.Add("Landscape");
+			colorInterpretators.Add("Water Flow");
+			colorInterpretators.Add("Fog");
 		}
 
 		protected Color GetColor(float value, float minValue, float maxValue, float waterLevel)
