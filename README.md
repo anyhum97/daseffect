@@ -1,17 +1,17 @@
 daseffect Project:
 <br>
+
 <p>
-  Generates pseudo-random structures using discrete differential operators.
-  <br>
+  Generates pseudo-random structures using discrete differential operators.<br>
   Perlin noise is not used.
-  <br>
-  There is an GPU(Cuda C) parallel implementation.
 </p>
 
 <p>
+  There is an GPU(Cuda C) parallel implementation.<br>
   To Build Cuda C project download and install CUDA Toolkit:<br>
   https://developer.nvidia.com/cuda-toolkit<br>
 </p>
+
 <p>
   Note: GPU code will only work on nVidia devices.
 </p>
