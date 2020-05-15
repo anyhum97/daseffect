@@ -42,8 +42,6 @@ namespace User_Interface
 			colorInterpretators.Add("Landscape");
 			colorInterpretators.Add("Water Flow");
 			colorInterpretators.Add("Fog");
-
-			ColorInterpretatorCount = _colorInterpretators.Length;
 		}
 
 		protected Color GetColor(float value, float minValue, float maxValue, float waterLevel)

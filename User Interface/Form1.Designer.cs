@@ -239,6 +239,7 @@
 			// 
 			// trackBar4
 			// 
+			this.trackBar4.LargeChange = 1;
 			this.trackBar4.Location = new System.Drawing.Point(544, 419);
 			this.trackBar4.Maximum = 32;
 			this.trackBar4.Name = "trackBar4";

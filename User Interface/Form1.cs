@@ -176,6 +176,11 @@ namespace User_Interface
 			daseffect.WaterLevel = factor;
 			trackBar2.Value = (int)(daseffect.WaterLevel * trackBar2.Maximum+0.5f);
 			textBox1.Text = Float2(daseffect.WaterLevel);
+			
+			if(!_isRendering)
+			{
+				UpdateImage();
+			}
 		}
 
 		private void trackBar1_Scroll(object sender, EventArgs e)

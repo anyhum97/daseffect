@@ -80,6 +80,31 @@ namespace ColorInterpretators
 {
 	////////////////////////////////////////////////////////////////////////
 
+	__device__ int MixColor(int color1, int color2, float value, float border1, float border2)
+	{
+		float distance1 = border1-value;
+		float distance2 = border2-value;
+
+		if(distance1 < 0.0f)
+		{
+			distance1 = -distance1;
+		}
+
+		if(distance2 < 0.0f)
+		{
+			distance2 = -distance2;
+		}
+
+		float value1 = distance2/(distance1 + distance2);
+		float value2 = distance1/(distance1 + distance2);
+
+		return Color((int)((unsigned char)(color1 >> 16)*value1 + (unsigned char)(color2 >> 16)*value2),
+					 (int)((unsigned char)(color1 >> 8 )*value1 + (unsigned char)(color2 >> 8 )*value2),
+					 (int)((unsigned char)(color1 >> 0 )*value1 + (unsigned char)(color2 >> 0 )*value2));
+	}
+
+	////////////////////////////////////////////////////////////////////////
+
 	__device__ int DefaultColor(float value, float MaxValue, float MinValue, float WaterLevel)
 	{
 		if(value == 0.0f)
@@ -101,18 +126,106 @@ namespace ColorInterpretators
 		}
 	}
 
+	__device__ int BooleanColor(float value, float MaxValue, float MinValue, float WaterLevel)
+	{
+		if(value == 0.0f)
+		{
+			return Color(255, 255, 255);
+		}
+
+		if(value < 0.0f)
+		{		
+			return Color(0, 0, 255);
+		}
+
+		return Color(0, 0, 0);
+	}
+
+	__device__ int Landscape(float value, float MaxValue, float MinValue, float WaterLevel)
+	{
+		value = value - MinValue;
+		
+		float factor = MaxValue - MinValue;
+		
+		if(value < 0.12*factor)
+		{
+			return Color(6, 0, 47);
+		}
+		
+		if(value < 0.25*factor)
+		{
+			return Color(23, 0, 187);
+		}
+		
+		if(value < 0.33*factor)
+		{
+			return Color(119, 100, 255);
+		}
+		
+		if(value < 0.5*factor)
+		{
+			return Color(119, 100, 255);
+		}
+		
+		if(value < 0.65*factor)
+		{
+			return Color(243, 188, 73);
+		}
+		
+		if(value < 0.80*factor)
+		{
+			return Color(28, 231, 12);
+		}
+		
+		if(value < 0.85*factor)
+		{
+			return Color(32, 210, 180);
+		}
+		
+		return Color(255, 255, 255);
+	}
+
+	__device__ int WaterFlow(float value, float MaxValue, float MinValue, float WaterLevel)
+	{
+		value = value - MinValue;
+
+		float factor = MaxValue - MinValue;
+		
+		if(factor == 0.0f)
+		{
+			return Color(255.0f, 255.0f, 255.0f);
+		}
+		
+		value /= factor;
+		
+		if(value < WaterLevel)
+		{
+			return MixColor(Color(5, 2, 40), Color(162, 249, 240), value, 0.0f, WaterLevel);
+		}
+		
+		return MixColor(Color(215, 172, 2), Color(11, 237, 5), value, WaterLevel, 0.9f);
+	}
+
 	////////////////////////////////////////////////////////////////////////
 
 	__device__ ColorInterpretator Interpretators[] = 
 	{
 		DefaultColor,
+		BooleanColor,
+		Landscape,
+		WaterFlow, 
+
 	};
 
-	const unsigned int Count = 1;
+	const unsigned int Count = 4;
 
 	char* Titles[] = 
 	{
 		"Default Color",
+		"Boolean Color",
+		"Landscape",
+		"Water Flow",
+
 	};
 }
 

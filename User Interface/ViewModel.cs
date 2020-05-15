@@ -15,7 +15,7 @@ namespace User_Interface
 
 		private bool _isRendering = false;
 
-		public const int DefaultFramesPerOperation = 4;
+		public const int DefaultFramesPerOperation = 1;
 
 		public const int MinFramesPerOperation = 1;
 		public const int MaxFramesPerOperation = 128;
