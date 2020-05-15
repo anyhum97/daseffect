@@ -9,11 +9,18 @@ namespace User_Interface
 	{
 		/// <summary>
 		/// Used in frame transactions.
+		/// [Width x Height];
 		/// </summary>
 		private volatile int[] _buffer;
 
 		/// <summary>
-		/// Import dll functions to use Cuda Implementation.
+		/// Used to send current field state.
+		/// [2 x Width x Height];
+		/// </summary>
+		private volatile float[] _send;
+
+		/// <summary>
+		/// Import dll functions to use the Cuda Implementation.
 		/// </summary>
 		
 		[DllImport(@"Cuda Implementation.dll")]
@@ -93,6 +100,8 @@ namespace User_Interface
 
 			_buffer = new int[width*height];
 
+			_send = new float[2*width*height];
+
 			CorruptionRate = DefaultCorruptionRate;
 			WaterLevel = DefaultWaterLevel;
 			PhaseSpeed = DefaultPhaseSpeed;
@@ -117,7 +126,7 @@ namespace User_Interface
 				return false;
 			}
 
-			if(_buffer == null)
+			if(_buffer == null || _send == null)
 			{
 				return false;
 			}
@@ -133,6 +142,7 @@ namespace User_Interface
 		public void Clear()
 		{
 			_buffer = null;
+			_send = null;
 
 			_random = new Random();
 
@@ -146,6 +156,51 @@ namespace User_Interface
 			Height = 0;
 
 			Ready = false;
+		}
+
+		public override void AddNoise(float minValue, float maxValue, float freq)
+		{
+			if(!IsValid())
+			{
+				return;
+			}
+
+			if(freq > 1.0f)
+			{
+				freq = 1.0f;
+			}
+
+			if(freq <= 0.0f)
+			{
+				return;
+			}
+
+			for(int i=0; i<Width; ++i)
+			{
+				for(int j=0; j<Height; ++j)
+				{
+					if(_random.NextDouble() <= freq)
+					{
+						float value = minValue + (maxValue-minValue)*(float)(_random.NextDouble());
+						
+						_send[i*Height+j] = value;
+					}
+
+					if(_random.NextDouble() <= freq)
+					{
+						float value = minValue + (maxValue-minValue)*(float)(_random.NextDouble());
+						
+						_send[Width*Height + i*Height+j] = value;
+					}
+				}
+			}
+
+			CudaSetState(_send, Width, Height);
+		}
+
+		public override void AddNoise(float value, float freq)
+		{
+			AddNoise(value, value, freq);
 		}
 
 		public override Bitmap GetBitmap()
@@ -179,8 +234,6 @@ namespace User_Interface
 				}
 			}
 
-			//GC.Collect();
-
 			return bitmap;
 		}
 
@@ -197,29 +250,6 @@ namespace User_Interface
 			}
 
 			return IterationTime = CudaCalc(PhaseSpeed, ticks);
-		}
-
-		public override void Set(int dim, int x, int y, float value)
-		{
-			if(dim > 1 || x < 0 || y < 0 || x >= Width || y >= Height)
-			{
-				throw new ArgumentException();
-			}
-
-			float[] dump = new float[2*Width*Height];
-
-			CudaGetState(dump, Width, Height);
-
-			try
-			{
-				dump[dim*Width*Height+x*Height+y] = value;
-			}
-			catch
-			{
-				
-			}
-
-			CudaSetState(dump, Width, Height);
 		}
 	}
 }

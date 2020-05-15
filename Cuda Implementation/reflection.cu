@@ -245,7 +245,20 @@ Type* Device(Reflection<Type>& reflection)
 
 ////////////////////////////////////////////////////////////////////////
 
+template <typename Type>
 
+void Clear(Reflection<Type>& reflection)
+{
+	if(reflection.size)
+	{
+		if(reflection.host != nullptr)
+		{
+			memset(reflection.host, 0, reflection.size);
+		}
+	}
+}
+
+////////////////////////////////////////////////////////////////////////
 
 
 

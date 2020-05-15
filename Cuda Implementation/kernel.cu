@@ -443,8 +443,7 @@ bool SetDefaultState()
 		return false;
 	}
 
-	Host(Buffer)[GetBufferIndex(0, Width >> 1, Height >> 1, Width, Height)] = 1.0f;
-	Host(Buffer)[GetBufferIndex(1, Width >> 1, Height >> 1, Width, Height)] = 1.0f;
+	Clear(Buffer);
 
 	return Send(Buffer);
 }

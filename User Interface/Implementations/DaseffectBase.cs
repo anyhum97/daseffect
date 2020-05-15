@@ -109,7 +109,12 @@ namespace User_Interface
 
 		public abstract bool IsValid();
 
+		/// <summary>
+		/// Adds Random Noise (Using Random Seed).
+		/// </summary>
+		public abstract void AddNoise(float minValue, float maxValue, float freq);
 
+		public abstract void AddNoise(float value, float freq);
 
 		public abstract Bitmap GetBitmap();
 
@@ -118,8 +123,6 @@ namespace User_Interface
 		/// </summary>
 		/// <returns></returns>
 		public abstract float Iteration(int Ticks);
-		
-		public abstract void Set(int dim, int x, int y, float value);
 	}
 }
 

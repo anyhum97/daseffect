@@ -243,7 +243,7 @@ namespace User_Interface
 			return Buffer[dim][x][y];
 		}
 
-		public override void Set(int dim, int x, int y, float value)
+		public void Set(int dim, int x, int y, float value)
 		{
 			// This Method Allows to Set the Buffer Element
 			
@@ -272,7 +272,9 @@ namespace User_Interface
 		public override Bitmap GetBitmap()
 		{
 			if(!IsValid())
+			{
 				return null;
+			}
 
 			Bitmap bitmap = new Bitmap(Width, Height);
 
@@ -286,24 +288,28 @@ namespace User_Interface
 				}
 			}
 
-			GC.Collect();
-
 			return bitmap;
 		}
 
 		/// <summary>
 		/// Adds Random Noise (Using Random Seed).
 		/// </summary>
-		public void AddNoise(float minValue, float maxValue, float freq)
+		public override void AddNoise(float minValue, float maxValue, float freq)
 		{
 			if(!IsValid())
+			{
 				return;
+			}
 
 			if(freq > 1.0f)
+			{
 				freq = 1.0f;
+			}
 
 			if(freq <= 0.0f)
+			{
 				return;
+			}
 
 			for(int i=0; i<Width; ++i)
 			{
@@ -328,30 +334,9 @@ namespace User_Interface
 			ReCount = true;
 		}
 		
-		public void AddNoise(float value, float freq)
+		public override void AddNoise(float value, float freq)
 		{
-			if(!IsValid())
-				return;
-
-			if(freq > 1.0f)
-				freq = 1.0f;
-
-			if(freq <= 0.0f)
-				return;
-
-			for(int i=0; i<Width; ++i)
-			{
-				for(int j=0; j<Height; ++j)
-				{
-					if(_random.NextDouble() <= freq)
-					{
-						Buffer[0][i][j] = value;
-						Buffer[1][i][j] = value;
-					}
-				}
-			}
-
-			ReCount = true;
+			AddNoise(value, value, freq);
 		}
 
 		public override float Iteration(int ticks)

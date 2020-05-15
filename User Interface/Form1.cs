@@ -16,10 +16,13 @@ namespace User_Interface
 		{
 			InitializeComponent();
 
-			daseffect = new CudaAdaptor(256, 256);
+			daseffect = new Daseffect(512, 512, 512);
+
+			daseffect.AddNoise(0.001f, 0.1f, 0.005f);
+
 			UpdateImage();
 
-			StartTimer(100);
+			StartTimer(80);
 		}
 
 		private void StartTimer(int interval = 100)
