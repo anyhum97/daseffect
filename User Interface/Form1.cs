@@ -50,7 +50,7 @@ namespace User_Interface
 
 		private void InitializeViewModel()
 		{
-			label1.Text = "iteration: --";
+			label1.Text = "iteration:";
 
 			SetComboBox1Items();
 			UpdateComboBox2Items();
@@ -143,6 +143,16 @@ namespace User_Interface
 
 					comboBox2.SelectedIndex = 0;
 				}
+			}
+		}
+
+		private void Tick()
+		{
+			if(daseffect != null)
+			{
+				var time = daseffect.Iteration(1);
+				label1.Text = "iteration: " + Float2(time) + "ms";
+				UpdateImage();
 			}
 		}
 
@@ -239,6 +249,16 @@ namespace User_Interface
 		private void button3_Click(object sender, EventArgs e)
 		{
 			System.Diagnostics.Process.Start("explorer", _lastDirectoryPath);
+		}
+
+		private void button1_Click(object sender, EventArgs e)
+		{
+			_isRendering = !_isRendering;
+		}
+
+		private void button2_Click(object sender, EventArgs e)
+		{
+			Tick();
 		}
 	}
 }

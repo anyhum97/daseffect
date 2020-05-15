@@ -206,6 +206,22 @@ namespace ColorInterpretators
 		return MixColor(Color(215, 172, 2), Color(11, 237, 5), value, WaterLevel, 0.9f);
 	}
 
+	__device__ int Fog(float value, float MaxValue, float MinValue, float WaterLevel)
+	{
+		value = value - MinValue;
+
+		float factor = MaxValue - MinValue;
+		
+		if(factor == 0.0f)
+		{
+			return Color(255.0f, 255.0f, 255.0f);
+		}
+
+		value /= factor;
+
+		return MixColor(Color(45, 45, 84), Color(235, 235, 255), value, 0.0f, 1.0f);
+	}
+
 	////////////////////////////////////////////////////////////////////////
 
 	__device__ ColorInterpretator Interpretators[] = 
@@ -214,10 +230,11 @@ namespace ColorInterpretators
 		BooleanColor,
 		Landscape,
 		WaterFlow, 
+		Fog,
 
 	};
 
-	const unsigned int Count = 4;
+	const unsigned int Count = 5;
 
 	char* Titles[] = 
 	{
@@ -225,6 +242,7 @@ namespace ColorInterpretators
 		"Boolean Color",
 		"Landscape",
 		"Water Flow",
+		"Fog",
 
 	};
 }

@@ -166,12 +166,7 @@ namespace User_Interface
 				return MixColor(Color.FromArgb(5, 2, 40), Color.FromArgb(162, 249, 240), value, 0.0f, waterLevel);
 			}
 
-			//if(value < 0.9f)
-			//{
-				return MixColor(Color.FromArgb(215, 172, 2), Color.FromArgb(11, 237, 5), value, waterLevel, 0.9f);
-			//}
-
-			//return Color.White;
+			return MixColor(Color.FromArgb(215, 172, 2), Color.FromArgb(11, 237, 5), value, waterLevel, 0.9f);
 		}
 
 		private static Color GetFogColor(float value, float MinValue, float MaxValue, float waterLevel)
