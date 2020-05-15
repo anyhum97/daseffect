@@ -7,10 +7,6 @@ namespace User_Interface
 {
 	public partial class Form1
 	{
-		private DaseffectBase daseffect;
-
-		public Bitmap CurrentBitmap { get; set; }
-
 		private Timer _timer;
 
 		private int _counter = 0;

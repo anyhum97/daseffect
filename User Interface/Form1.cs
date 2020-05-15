@@ -12,17 +12,25 @@ namespace User_Interface
 {
 	public partial class Form1 : Form
 	{
+		private DaseffectBase daseffect;
+
+		public Bitmap CurrentBitmap { get; set; }
+
 		public Form1()
 		{
 			InitializeComponent();
+			InitializePhysicalModel();
+			label1.Text = "iteration: ";
+			StartTimer(80);
+		}
 
-			daseffect = new Daseffect(512, 512, 512);
+		private void InitializePhysicalModel()
+		{
+			daseffect = new CudaAdaptor(512, 512, 512);
 
 			daseffect.AddNoise(0.001f, 0.1f, 0.005f);
 
 			UpdateImage();
-
-			StartTimer(80);
 		}
 
 		private void StartTimer(int interval = 100)
@@ -53,7 +61,9 @@ namespace User_Interface
 			{
 				if(daseffect != null && daseffect.IsValid())
 				{
-					daseffect.Iteration(FramesPerOperation);
+					var time = daseffect.Iteration(FramesPerOperation);
+
+					label1.Text = string.Format("iteration: {0:F2} ms", time);
 
 					UpdateImage();
 

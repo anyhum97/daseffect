@@ -63,12 +63,14 @@ namespace User_Interface
 
 			if(value < 0.0f)
 			{
-				int intensity = (int)(Math.Floor(255.0f * value / MinValue));
+				int intensity = (int)(255.0f * (value / MinValue));
+
 				return Color.FromArgb(0, 0, intensity);
 			}
 			else
 			{
-				int intensity = (int)(Math.Floor(255.0f-255.0f * value / MaxValue));
+				int intensity = (int)(255.0f-255.0f * (value / MaxValue));
+
 				return Color.FromArgb(intensity, intensity, intensity);
 			}
 		}

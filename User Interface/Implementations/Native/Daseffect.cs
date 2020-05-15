@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Text;
@@ -341,6 +342,8 @@ namespace User_Interface
 
 		public override float Iteration(int ticks)
 		{
+			var startTime = Stopwatch.StartNew();
+
 			for(int i=0; i<ticks; ++i)
 			{
 				if(Optimazed)
@@ -353,7 +356,9 @@ namespace User_Interface
 				}
 			}
 
-			return 1.0f;
+			startTime.Stop();
+
+			return (float)startTime.Elapsed.TotalMilliseconds;
 		}
 
 		private void СycleIteration()
