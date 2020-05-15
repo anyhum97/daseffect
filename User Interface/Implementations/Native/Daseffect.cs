@@ -403,8 +403,6 @@ namespace User_Interface
 
 			////////////////////////////////////////////////////////////////////////////////////////////////
 
-			const float velocity = 0.50f;	// Phase Speed;
-
 			_bufferMinValue = float.MaxValue;
 			_bufferMaxValue = float.MinValue;
 
@@ -422,7 +420,7 @@ namespace User_Interface
 										   Get(1, i, j-1) - 4.0f * 
 										   Get(1, i, j);
 
-						Buffer[2][i][j] = 2.0f*Buffer[1][i][j] - Buffer[0][i][j] + velocity*laplacian;
+						Buffer[2][i][j] = 2.0f*Buffer[1][i][j] - Buffer[0][i][j] + PhaseSpeed*laplacian;
 					}
 					else
 					{
@@ -459,7 +457,7 @@ namespace User_Interface
 
 			////////////////////////////////////////////////////////////////////////////////////////////////
 
-			const float velocity = 0.48f;	// Phase Speed;
+			float velocity = PhaseSpeed;
 
 			// Cycle Optimization Picture:
 

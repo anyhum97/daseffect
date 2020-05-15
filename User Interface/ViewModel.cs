@@ -16,7 +16,7 @@ namespace User_Interface
 		public const int DefaultFramesPerOperation = 4;
 
 		public const int MinFramesPerOperation = 1;
-		public const int MaxFramesPerOperation = 256;
+		public const int MaxFramesPerOperation = 128;
 
 		private int _framesPerOperation = DefaultFramesPerOperation;
 

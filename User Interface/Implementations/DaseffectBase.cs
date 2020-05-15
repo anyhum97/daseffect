@@ -24,8 +24,8 @@ namespace User_Interface
 		
 		public const double DefaultCorruptionRate = 0.950;
 		
-		public const double MinCorruptionRate = 0.001;
-		public const double MaxCorruptionRate = 1.000;
+		public const double MinCorruptionRate = 0.01;
+		public const double MaxCorruptionRate = 1.00;
 
 		/// <summary>
 		/// Shows what percentage of points should be recalculated.
@@ -126,7 +126,7 @@ namespace User_Interface
 		/// Provide one tick of physical model.
 		/// </summary>
 		/// <returns></returns>
-		public abstract float Iteration(int Ticks);
+		public abstract float Iteration(int ticks);
 
 		public abstract List<string> GetColorInterpretatorsTitle();
 
