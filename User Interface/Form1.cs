@@ -66,8 +66,6 @@ namespace User_Interface
 
 		private void InitializeViewModel()
 		{
-			label1.Text = "iteration:";
-
 			SetComboBox1Items();
 			UpdateComboBox2Items();
 		}
@@ -289,6 +287,18 @@ namespace User_Interface
 				Tick();
 				SaveImage();
 			}
+		}
+
+		private void button6_Click(object sender, EventArgs e)
+		{
+			int index = comboBox1.SelectedIndex;
+
+			if(index > 1)
+			{
+				index = 1;
+			}
+
+			InitializePhysicalModel(index);
 		}
 	}
 }

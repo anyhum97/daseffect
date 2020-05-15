@@ -50,7 +50,7 @@
 			this.trackBar4 = new System.Windows.Forms.TrackBar();
 			this.button1 = new System.Windows.Forms.Button();
 			this.button2 = new System.Windows.Forms.Button();
-			this.button5 = new System.Windows.Forms.Button();
+			this.button6 = new System.Windows.Forms.Button();
 			((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.trackBar1)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.trackBar2)).BeginInit();
@@ -70,7 +70,7 @@
 			// label1
 			// 
 			this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-			this.label1.Location = new System.Drawing.Point(374, 540);
+			this.label1.Location = new System.Drawing.Point(374, 539);
 			this.label1.Name = "label1";
 			this.label1.Size = new System.Drawing.Size(150, 23);
 			this.label1.TabIndex = 1;
@@ -272,22 +272,22 @@
 			this.button2.UseVisualStyleBackColor = true;
 			this.button2.Click += new System.EventHandler(this.button2_Click);
 			// 
-			// button5
+			// button6
 			// 
-			this.button5.Location = new System.Drawing.Point(204, 530);
-			this.button5.Name = "button5";
-			this.button5.Size = new System.Drawing.Size(90, 43);
-			this.button5.TabIndex = 22;
-			this.button5.Text = "Shot 60";
-			this.button5.UseVisualStyleBackColor = true;
-			this.button5.Click += new System.EventHandler(this.button5_Click);
+			this.button6.Location = new System.Drawing.Point(204, 530);
+			this.button6.Name = "button6";
+			this.button6.Size = new System.Drawing.Size(90, 43);
+			this.button6.TabIndex = 23;
+			this.button6.Text = "Reset";
+			this.button6.UseVisualStyleBackColor = true;
+			this.button6.Click += new System.EventHandler(this.button6_Click);
 			// 
 			// Form1
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(799, 603);
-			this.Controls.Add(this.button5);
+			this.Controls.Add(this.button6);
 			this.Controls.Add(this.button2);
 			this.Controls.Add(this.button1);
 			this.Controls.Add(this.textBox4);
@@ -311,7 +311,7 @@
 			this.Controls.Add(this.label1);
 			this.Controls.Add(this.pictureBox1);
 			this.Name = "Form1";
-			this.Text = "Form1";
+			this.Text = "daseffect";
 			((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
 			((System.ComponentModel.ISupportInitialize)(this.trackBar1)).EndInit();
 			((System.ComponentModel.ISupportInitialize)(this.trackBar2)).EndInit();
@@ -346,7 +346,7 @@
 		private System.Windows.Forms.TrackBar trackBar4;
 		private System.Windows.Forms.Button button1;
 		private System.Windows.Forms.Button button2;
-		private System.Windows.Forms.Button button5;
+		private System.Windows.Forms.Button button6;
 	}
 }
 

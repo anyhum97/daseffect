@@ -472,6 +472,11 @@ void CudaFree()
 	Free(MinValueBuffer);
 
 	Free(SumBuffer);
+	
+	Free(MaxValue);
+	Free(MinValue);
+
+	Free(Sum);
 
 	IsLoaded = false;
 }
