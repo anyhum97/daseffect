@@ -20,7 +20,6 @@ namespace User_Interface
 		public Form1()
 		{
 			InitializeComponent();
-			InitializePhysicalModel();
 			InitializeViewModel();
 			StartTimer(80);
 		}
@@ -114,6 +113,8 @@ namespace User_Interface
 
 		private void UpdateComboBox2Items()
 		{
+			comboBox2.Items.Clear();
+
 			if(daseffect != null)
 			{
 				List<string> list = daseffect.GetColorInterpretatorsTitle();
@@ -137,8 +138,6 @@ namespace User_Interface
 
 		private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
 		{
-			var comboBox1 = (ComboBox)sender;
-
 			int index = comboBox1.SelectedIndex;
 
 			if(index > 1)
@@ -147,6 +146,13 @@ namespace User_Interface
 			}
 
 			InitializePhysicalModel(index);
+			UpdateComboBox2Items();
+		}
+
+		private void comboBox2_SelectedIndexChanged(object sender, EventArgs e)
+		{
+			daseffect.SetColorInterpretator(comboBox2.SelectedIndex);
+			UpdateImage();
 		}
 	}
 }

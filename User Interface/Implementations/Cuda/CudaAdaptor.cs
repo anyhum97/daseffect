@@ -113,6 +113,11 @@ namespace User_Interface
 			Ready = true;
 		}
 
+		static CudaAdaptor()
+		{
+			ColorInterpretatorCount = GetColorInterpretatorCount();
+		}
+
 		public void Dispose()
 		{
 			CudaFree();
@@ -274,6 +279,21 @@ namespace User_Interface
 			}
 
 			return list;
+		}
+
+		public override void SetColorInterpretator(int index)
+		{
+			if(!IsValid())
+			{
+				return;
+			}
+
+			if(index >= ColorInterpretatorCount)
+			{
+				index = 0;
+			}
+
+			ColorInterpretatorIndex = index;
 		}
 	}
 }

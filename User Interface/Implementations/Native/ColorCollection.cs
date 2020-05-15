@@ -42,11 +42,13 @@ namespace User_Interface
 			colorInterpretators.Add("Landscape");
 			colorInterpretators.Add("Water Flow");
 			colorInterpretators.Add("Fog");
+
+			ColorInterpretatorCount = _colorInterpretators.Length;
 		}
 
 		protected Color GetColor(float value, float minValue, float maxValue, float waterLevel)
 		{
-			return _colorInterpretators[(int)CurrentColorInterpretator](value, minValue, maxValue, waterLevel);
+			return _colorInterpretators[ColorInterpretatorIndex](value, minValue, maxValue, waterLevel);
 		}
 
 		private static Color MixColor(Color color1, Color color2, float value, float border1, float border2)

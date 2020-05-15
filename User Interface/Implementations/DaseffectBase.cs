@@ -106,6 +106,10 @@ namespace User_Interface
 		/// The Height of resulting image.
 		/// </summary>
 		public int Height { get; protected set; }
+		
+		public static int ColorInterpretatorCount { get; protected set; }
+
+		public int ColorInterpretatorIndex { get; protected set; } = 0;
 
 		public abstract bool IsValid();
 
@@ -125,6 +129,8 @@ namespace User_Interface
 		public abstract float Iteration(int Ticks);
 
 		public abstract List<string> GetColorInterpretatorsTitle();
+
+		public abstract void SetColorInterpretator(int index);
 	}
 }
 

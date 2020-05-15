@@ -34,8 +34,7 @@ namespace User_Interface
 
 		public Daseffect(int width, 
 			             int height, 
-						 int seed = 0, 
-						 ColorInterpretationType colorInterpretator = ColorInterpretationType.Default)
+						 int seed = 0)
 		{
 			// Minimus Buffer Size is [3][3][3];
 
@@ -78,8 +77,6 @@ namespace User_Interface
 				_random = new Random(seed);
 				RandomSeed = seed;
 			}
-
-			CurrentColorInterpretator = colorInterpretator;
 
 			CorruptionRate = DefaultCorruptionRate;
 			WaterLevel = DefaultWaterLevel;
@@ -695,6 +692,14 @@ namespace User_Interface
 		public override List<string> GetColorInterpretatorsTitle()
 		{
 			return colorInterpretators;
+		}
+
+		public override void SetColorInterpretator(int index)
+		{
+			if(index < ColorInterpretatorCount)
+			{
+				ColorInterpretatorIndex = index;
+			}
 		}
 	}
 }
