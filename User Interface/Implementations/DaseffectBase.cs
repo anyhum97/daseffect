@@ -109,9 +109,9 @@ namespace User_Interface
 		
 		public int IterationCount { get; protected set; } = 0;
 
-		public static int ColorInterpretatorCount { get; protected set; }
+		public int ColorInterpretatorCount { get; protected set; }
 
-		public int ColorInterpretatorIndex { get; protected set; } = 0;
+		public int ColorInterpretatorIndex { get; set; } = 0;
 
 		public abstract bool IsValid();
 

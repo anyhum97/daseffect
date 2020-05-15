@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Windows.Forms;
 
 namespace User_Interface
 {
@@ -73,6 +74,7 @@ namespace User_Interface
 
 			if(!CudaStart(width, height))
 			{
+				MessageBox.Show("Unable to start the GPU version.\nCheck if you have a suitable device");
 				return;
 			}
 
@@ -103,6 +105,8 @@ namespace User_Interface
 
 			_send = new float[2*width*height];
 
+			ColorInterpretatorCount = GetColorInterpretatorCount();
+
 			CorruptionRate = DefaultCorruptionRate;
 			WaterLevel = DefaultWaterLevel;
 			PhaseSpeed = DefaultPhaseSpeed;
@@ -111,11 +115,6 @@ namespace User_Interface
 			Height = height;
 
 			Ready = true;
-		}
-
-		static CudaAdaptor()
-		{
-			ColorInterpretatorCount = GetColorInterpretatorCount();
 		}
 
 		public void Dispose()
@@ -216,7 +215,7 @@ namespace User_Interface
 				return null;
 			}
 
-			FrameTime = GetCurrentFrame(_buffer, 0, WaterLevel);
+			FrameTime = GetCurrentFrame(_buffer, ColorInterpretatorIndex, WaterLevel);
 
 			if(FrameTime < 0)
 			{

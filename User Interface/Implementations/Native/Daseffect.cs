@@ -78,6 +78,8 @@ namespace User_Interface
 				RandomSeed = seed;
 			}
 
+			ColorInterpretatorCount = _colorInterpretators.Length;
+
 			CorruptionRate = DefaultCorruptionRate;
 			WaterLevel = DefaultWaterLevel;
 			PhaseSpeed = DefaultPhaseSpeed;

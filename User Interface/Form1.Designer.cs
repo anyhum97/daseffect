@@ -48,6 +48,9 @@
 			this.textBox4 = new System.Windows.Forms.TextBox();
 			this.label7 = new System.Windows.Forms.Label();
 			this.trackBar4 = new System.Windows.Forms.TrackBar();
+			this.button1 = new System.Windows.Forms.Button();
+			this.button2 = new System.Windows.Forms.Button();
+			this.button5 = new System.Windows.Forms.Button();
 			((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.trackBar1)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.trackBar2)).BeginInit();
@@ -67,10 +70,11 @@
 			// label1
 			// 
 			this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-			this.label1.Location = new System.Drawing.Point(14, 526);
+			this.label1.Location = new System.Drawing.Point(374, 540);
 			this.label1.Name = "label1";
 			this.label1.Size = new System.Drawing.Size(150, 23);
 			this.label1.TabIndex = 1;
+			this.label1.Text = "Iteration: 0 ms";
 			this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
 			// 
 			// comboBox2
@@ -80,7 +84,7 @@
 			this.comboBox2.Location = new System.Drawing.Point(545, 96);
 			this.comboBox2.Name = "comboBox2";
 			this.comboBox2.Size = new System.Drawing.Size(144, 24);
-			this.comboBox2.TabIndex = 3;
+			this.comboBox2.TabIndex = 2;
 			this.comboBox2.SelectedIndexChanged += new System.EventHandler(this.comboBox2_SelectedIndexChanged);
 			// 
 			// comboBox1
@@ -90,7 +94,7 @@
 			this.comboBox1.Location = new System.Drawing.Point(545, 34);
 			this.comboBox1.Name = "comboBox1";
 			this.comboBox1.Size = new System.Drawing.Size(144, 24);
-			this.comboBox1.TabIndex = 2;
+			this.comboBox1.TabIndex = 1;
 			this.comboBox1.SelectedIndexChanged += new System.EventHandler(this.comboBox1_SelectedIndexChanged);
 			// 
 			// label2
@@ -153,7 +157,7 @@
 			this.trackBar2.Maximum = 20;
 			this.trackBar2.Name = "trackBar2";
 			this.trackBar2.Size = new System.Drawing.Size(144, 45);
-			this.trackBar2.TabIndex = 4;
+			this.trackBar2.TabIndex = 3;
 			this.trackBar2.Value = 10;
 			this.trackBar2.Scroll += new System.EventHandler(this.trackBar2_Scroll);
 			// 
@@ -174,7 +178,7 @@
 			this.trackBar3.Maximum = 20;
 			this.trackBar3.Name = "trackBar3";
 			this.trackBar3.Size = new System.Drawing.Size(144, 45);
-			this.trackBar3.TabIndex = 6;
+			this.trackBar3.TabIndex = 7;
 			this.trackBar3.Value = 20;
 			this.trackBar3.Scroll += new System.EventHandler(this.trackBar3_Scroll);
 			// 
@@ -183,28 +187,28 @@
 			this.textBox1.Location = new System.Drawing.Point(694, 169);
 			this.textBox1.Name = "textBox1";
 			this.textBox1.Size = new System.Drawing.Size(50, 20);
-			this.textBox1.TabIndex = 101;
+			this.textBox1.TabIndex = 4;
 			// 
 			// textBox2
 			// 
 			this.textBox2.Location = new System.Drawing.Point(694, 251);
 			this.textBox2.Name = "textBox2";
 			this.textBox2.Size = new System.Drawing.Size(50, 20);
-			this.textBox2.TabIndex = 102;
+			this.textBox2.TabIndex = 6;
 			// 
 			// textBox3
 			// 
 			this.textBox3.Location = new System.Drawing.Point(694, 338);
 			this.textBox3.Name = "textBox3";
 			this.textBox3.Size = new System.Drawing.Size(50, 20);
-			this.textBox3.TabIndex = 103;
+			this.textBox3.TabIndex = 8;
 			// 
 			// button3
 			// 
 			this.button3.Location = new System.Drawing.Point(654, 481);
 			this.button3.Name = "button3";
 			this.button3.Size = new System.Drawing.Size(90, 43);
-			this.button3.TabIndex = 1;
+			this.button3.TabIndex = 12;
 			this.button3.Text = "Open Folder";
 			this.button3.UseVisualStyleBackColor = true;
 			this.button3.Click += new System.EventHandler(this.button3_Click);
@@ -214,7 +218,7 @@
 			this.button4.Location = new System.Drawing.Point(543, 481);
 			this.button4.Name = "button4";
 			this.button4.Size = new System.Drawing.Size(90, 43);
-			this.button4.TabIndex = 0;
+			this.button4.TabIndex = 11;
 			this.button4.Text = "Save Image";
 			this.button4.UseVisualStyleBackColor = true;
 			this.button4.Click += new System.EventHandler(this.button4_Click);
@@ -224,7 +228,7 @@
 			this.textBox4.Location = new System.Drawing.Point(694, 419);
 			this.textBox4.Name = "textBox4";
 			this.textBox4.Size = new System.Drawing.Size(50, 20);
-			this.textBox4.TabIndex = 104;
+			this.textBox4.TabIndex = 10;
 			// 
 			// label7
 			// 
@@ -239,19 +243,53 @@
 			// 
 			// trackBar4
 			// 
+			this.trackBar4.LargeChange = 1;
 			this.trackBar4.Location = new System.Drawing.Point(544, 419);
 			this.trackBar4.Maximum = 32;
 			this.trackBar4.Name = "trackBar4";
 			this.trackBar4.Size = new System.Drawing.Size(144, 45);
-			this.trackBar4.TabIndex = 7;
+			this.trackBar4.TabIndex = 9;
 			this.trackBar4.Value = 4;
 			this.trackBar4.Scroll += new System.EventHandler(this.trackBar4_Scroll);
+			// 
+			// button1
+			// 
+			this.button1.Location = new System.Drawing.Point(12, 530);
+			this.button1.Name = "button1";
+			this.button1.Size = new System.Drawing.Size(90, 43);
+			this.button1.TabIndex = 0;
+			this.button1.Text = "Start";
+			this.button1.UseVisualStyleBackColor = true;
+			this.button1.Click += new System.EventHandler(this.button1_Click);
+			// 
+			// button2
+			// 
+			this.button2.Location = new System.Drawing.Point(108, 530);
+			this.button2.Name = "button2";
+			this.button2.Size = new System.Drawing.Size(90, 43);
+			this.button2.TabIndex = 21;
+			this.button2.Text = "Tick";
+			this.button2.UseVisualStyleBackColor = true;
+			this.button2.Click += new System.EventHandler(this.button2_Click);
+			// 
+			// button5
+			// 
+			this.button5.Location = new System.Drawing.Point(204, 530);
+			this.button5.Name = "button5";
+			this.button5.Size = new System.Drawing.Size(90, 43);
+			this.button5.TabIndex = 22;
+			this.button5.Text = "Shot 60";
+			this.button5.UseVisualStyleBackColor = true;
+			this.button5.Click += new System.EventHandler(this.button5_Click);
 			// 
 			// Form1
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(799, 581);
+			this.ClientSize = new System.Drawing.Size(799, 603);
+			this.Controls.Add(this.button5);
+			this.Controls.Add(this.button2);
+			this.Controls.Add(this.button1);
 			this.Controls.Add(this.textBox4);
 			this.Controls.Add(this.label7);
 			this.Controls.Add(this.trackBar4);
@@ -306,6 +344,9 @@
 		private System.Windows.Forms.TextBox textBox4;
 		private System.Windows.Forms.Label label7;
 		private System.Windows.Forms.TrackBar trackBar4;
+		private System.Windows.Forms.Button button1;
+		private System.Windows.Forms.Button button2;
+		private System.Windows.Forms.Button button5;
 	}
 }
 

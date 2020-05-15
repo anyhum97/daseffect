@@ -23,6 +23,22 @@ namespace User_Interface
 			InitializeComponent();
 			InitializeViewModel();
 			StartTimer(80);
+
+			KeyPreview = true;
+			KeyDown += Form1_KeyDown;
+		}
+
+		private void Form1_KeyDown(object sender, KeyEventArgs e)
+		{
+			if(e.KeyCode == Keys.D1)
+			{
+				Tick();
+			}
+
+			if(e.KeyCode == Keys.D2)
+			{
+				SaveImage();
+			}
 		}
 
 		private void InitializePhysicalModel(int modelType = 0)
@@ -50,7 +66,7 @@ namespace User_Interface
 
 		private void InitializeViewModel()
 		{
-			label1.Text = "iteration: --";
+			label1.Text = "iteration:";
 
 			SetComboBox1Items();
 			UpdateComboBox2Items();
@@ -146,61 +162,17 @@ namespace User_Interface
 			}
 		}
 
-		private void pictureBox1_Click(object sender, EventArgs e)
+		private void Tick()
 		{
-			_isRendering = !_isRendering;
-		}
-
-		private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
-		{
-			int index = comboBox1.SelectedIndex;
-
-			if(index > 1)
+			if(daseffect != null)
 			{
-				index = 1;
+				var time = daseffect.Iteration(1);
+				label1.Text = "iteration: " + Float2(time) + "ms";
+				UpdateImage();
 			}
-
-			InitializePhysicalModel(index);
-			UpdateComboBox2Items();
 		}
 
-		private void comboBox2_SelectedIndexChanged(object sender, EventArgs e)
-		{
-			daseffect.SetColorInterpretator(comboBox2.SelectedIndex);
-			UpdateImage();
-		}
-
-		private void trackBar2_Scroll(object sender, EventArgs e)
-		{
-			float factor = (float)trackBar2.Value / trackBar2.Maximum;
-			daseffect.WaterLevel = factor;
-			trackBar2.Value = (int)(daseffect.WaterLevel * trackBar2.Maximum+0.5f);
-			textBox1.Text = Float2(daseffect.WaterLevel);
-		}
-
-		private void trackBar1_Scroll(object sender, EventArgs e)
-		{
-			float factor = (float)trackBar1.Value / trackBar1.Maximum;
-			daseffect.CorruptionRate = factor;
-			trackBar1.Value = (int)(daseffect.CorruptionRate * trackBar2.Maximum+0.5f);
-			textBox2.Text = Float2(daseffect.CorruptionRate);
-		}
-
-		private void trackBar3_Scroll(object sender, EventArgs e)
-		{
-			float factor = Daseffect.MaxPhaseSpeed * (float)trackBar3.Value / trackBar3.Maximum;
-			daseffect.PhaseSpeed = factor;
-			trackBar3.Value = (int)(daseffect.PhaseSpeed * trackBar2.Maximum / Daseffect.MaxPhaseSpeed + 0.5f);
-			textBox3.Text = Float2(daseffect.PhaseSpeed);
-		}
-
-		private void trackBar4_Scroll(object sender, EventArgs e)
-		{
-			FramesPerOperation = trackBar4.Value*4;
-			textBox4.Text = FramesPerOperation.ToString();
-		}
-
-		private void button4_Click(object sender, EventArgs e)
+		private void SaveImage()
 		{
 			if(daseffect != null && daseffect.IsValid())
 			{
@@ -231,9 +203,92 @@ namespace User_Interface
 			}
 		}
 
+		private void pictureBox1_Click(object sender, EventArgs e)
+		{
+			_isRendering = !_isRendering;
+		}
+
+		private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
+		{
+			int index = comboBox1.SelectedIndex;
+
+			if(index > 1)
+			{
+				index = 1;
+			}
+
+			InitializePhysicalModel(index);
+			UpdateComboBox2Items();
+		}
+
+		private void comboBox2_SelectedIndexChanged(object sender, EventArgs e)
+		{
+			daseffect.SetColorInterpretator(comboBox2.SelectedIndex);
+			UpdateImage();
+		}
+
+		private void trackBar2_Scroll(object sender, EventArgs e)
+		{
+			float factor = (float)trackBar2.Value / trackBar2.Maximum;
+			daseffect.WaterLevel = factor;
+			trackBar2.Value = (int)(daseffect.WaterLevel * trackBar2.Maximum+0.5f);
+			textBox1.Text = Float2(daseffect.WaterLevel);
+			
+			if(!_isRendering)
+			{
+				UpdateImage();
+			}
+		}
+
+		private void trackBar1_Scroll(object sender, EventArgs e)
+		{
+			float factor = (float)trackBar1.Value / trackBar1.Maximum;
+			daseffect.CorruptionRate = factor;
+			trackBar1.Value = (int)(daseffect.CorruptionRate * trackBar2.Maximum+0.5f);
+			textBox2.Text = Float2(daseffect.CorruptionRate);
+		}
+
+		private void trackBar3_Scroll(object sender, EventArgs e)
+		{
+			float factor = Daseffect.MaxPhaseSpeed * (float)trackBar3.Value / trackBar3.Maximum;
+			daseffect.PhaseSpeed = factor;
+			trackBar3.Value = (int)(daseffect.PhaseSpeed * trackBar2.Maximum / Daseffect.MaxPhaseSpeed + 0.5f);
+			textBox3.Text = Float2(daseffect.PhaseSpeed);
+		}
+
+		private void trackBar4_Scroll(object sender, EventArgs e)
+		{
+			FramesPerOperation = trackBar4.Value*4;
+			textBox4.Text = FramesPerOperation.ToString();
+		}
+
+		private void button4_Click(object sender, EventArgs e)
+		{
+			SaveImage();
+		}
+
 		private void button3_Click(object sender, EventArgs e)
 		{
 			System.Diagnostics.Process.Start("explorer", _lastDirectoryPath);
+		}
+
+		private void button1_Click(object sender, EventArgs e)
+		{
+			_isRendering = !_isRendering;
+		}
+
+		private void button2_Click(object sender, EventArgs e)
+		{
+			Tick();
+		}
+
+		private void button5_Click(object sender, EventArgs e)
+		{
+			for(int i=0; i<60; ++i)
+			{
+				Tick();
+				SaveImage();
+			}
 		}
 	}
 }
