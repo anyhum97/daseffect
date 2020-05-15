@@ -6,10 +6,13 @@ daseffect Project:
   Perlin noise is not used.
   <br>
   There is an GPU(Cuda C) parallel implementation.
-  </p>
+</p>
+
 <p>
-  To Build Cuda C project download and install CUDA Toolkit from:<br>
-  https://developer.nvidia.com/cuda-toolkit<br>  
+  To Build Cuda C project download and install CUDA Toolkit:<br>
+  https://developer.nvidia.com/cuda-toolkit<br>
+</p>
+<p>
   Note: GPU code will only work on nVidia devices.
 </p>
 
