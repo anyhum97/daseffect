@@ -14,7 +14,7 @@ namespace User_Interface
 {
 	public partial class Form1 : Form
 	{
-		#region Fields
+		#region fields
 
 		private DaseffectBase daseffect;
 
@@ -71,45 +71,6 @@ namespace User_Interface
 				{
 					_isRendering = value;
 					NotifyPropertyChanged(NotifyIsRenderingChanged);
-				}
-			}
-		}
-
-		#endregion
-
-		#region FramesPerOperation
-
-		public const int DefaultFramesPerOperation = 1;
-
-		public const int MinFramesPerOperation = 1;
-		public const int MaxFramesPerOperation = 128;
-
-		private int _framesPerOperation = DefaultFramesPerOperation;
-
-		public event EventHandler NotifyFramesPerOperationChanged;
-
-		public int FramesPerOperation
-		{
-			get => _framesPerOperation;
-			
-			set
-			{
-				int newValue = value;
-
-				if(newValue < MinFramesPerOperation)
-				{
-					newValue = MinFramesPerOperation;
-				}
-
-				if(newValue > MaxFramesPerOperation)
-				{
-					newValue = MaxFramesPerOperation;
-				}
-
-				if(_framesPerOperation != newValue)
-				{
-					_framesPerOperation = newValue;
-					NotifyPropertyChanged(NotifyFramesPerOperationChanged);
 				}
 			}
 		}
@@ -209,6 +170,45 @@ namespace User_Interface
 
 		#endregion
 
+		#region FramesPerOperation
+
+		public const int DefaultFramesPerOperation = 1;
+
+		public const int MinFramesPerOperation = 1;
+		public const int MaxFramesPerOperation = 128;
+
+		private int _framesPerOperation = DefaultFramesPerOperation;
+
+		public event EventHandler NotifyFramesPerOperationChanged;
+
+		public int FramesPerOperation
+		{
+			get => _framesPerOperation;
+			
+			set
+			{
+				int newValue = value;
+
+				if(newValue < MinFramesPerOperation)
+				{
+					newValue = MinFramesPerOperation;
+				}
+
+				if(newValue > MaxFramesPerOperation)
+				{
+					newValue = MaxFramesPerOperation;
+				}
+
+				if(_framesPerOperation != newValue)
+				{
+					_framesPerOperation = newValue;
+					NotifyPropertyChanged(NotifyFramesPerOperationChanged);
+				}
+			}
+		}
+
+		#endregion
+
 		#endregion
 
 		public Form1()
@@ -277,8 +277,10 @@ namespace User_Interface
 			comboBox1.SelectedIndex = 0;
 		}
 
-		private void UpdateComboBox2Items()
+		private void UpdateComboBox2Items(bool setIndex = true)
 		{
+			int savedIndex = comboBox2.SelectedIndex;
+
 			comboBox2.Items.Clear();
 
 			if(daseffect != null)
@@ -292,14 +294,26 @@ namespace User_Interface
 						comboBox2.Items.Add(title);
 					}
 
-					if(comboBox2.Items.Count > 3)
+					int index = 0;
+
+					if(setIndex)
 					{
-						comboBox2.SelectedIndex = 3;
+						if(comboBox2.Items.Count > 3)
+						{
+							index = 3;
+						}
 					}
 					else
 					{
-						comboBox2.SelectedIndex = 0;
+						if(comboBox2.Items.Count > savedIndex)
+						{
+							index = savedIndex;
+						}
 					}
+
+					comboBox2.SelectedIndex = index;
+
+					daseffect.SetColorInterpretator(comboBox2.SelectedIndex);
 				}
 			}
 		}
@@ -320,7 +334,7 @@ namespace User_Interface
 			{
 				if(daseffect != null)
 				{
-					var time = daseffect.Iteration(FramesPerOperation);
+					float time = daseffect.Iteration(FramesPerOperation);
 
 					label1.Text = "iteration: " + Float2(time) + "ms";
 
@@ -408,7 +422,7 @@ namespace User_Interface
 			}
 
 			InitializePhysicalModel(index);
-			UpdateComboBox2Items();
+			UpdateComboBox2Items(false);
 		}
 
 		private void comboBox2_SelectedIndexChanged(object sender, EventArgs e)
@@ -455,7 +469,11 @@ namespace User_Interface
 
 		private void button3_Click(object sender, EventArgs e)
 		{
-			System.Diagnostics.Process.Start("explorer", _lastDirectoryPath);
+			try
+			{
+				System.Diagnostics.Process.Start("explorer", _lastDirectoryPath);
+			}
+			catch { }
 		}
 
 		private void button4_Click(object sender, EventArgs e)
@@ -483,15 +501,10 @@ namespace User_Interface
 
 			InitializePhysicalModel(index);
 		}
-
-		private void Tick()
+		
+		private string Float2<Type>(Type value) where Type: struct
 		{
-			if(daseffect != null)
-			{
-				var time = daseffect.Iteration(1);
-				label1.Text = "iteration: " + Float2(time) + "ms";
-				UpdateImage();
-			}
+			return string.Format(CultureInfo.InvariantCulture, "{0:F2}", value);
 		}
 
 		private void SaveImage()
@@ -525,10 +538,14 @@ namespace User_Interface
 			}
 		}
 
-		private string Float2<Type>(Type value) where Type: struct
+		private void Tick()
 		{
-			return string.Format(CultureInfo.InvariantCulture, "{0:F2}", value);
+			if(daseffect != null)
+			{
+				float time = daseffect.Iteration(1);
+				label1.Text = "iteration: " + Float2(time) + "ms";
+				UpdateImage();
+			}
 		}
-
 	}
 }

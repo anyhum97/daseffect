@@ -186,22 +186,28 @@
 			// 
 			this.textBox1.Location = new System.Drawing.Point(694, 169);
 			this.textBox1.Name = "textBox1";
+			this.textBox1.ReadOnly = true;
 			this.textBox1.Size = new System.Drawing.Size(50, 20);
 			this.textBox1.TabIndex = 4;
+			this.textBox1.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
 			// 
 			// textBox2
 			// 
 			this.textBox2.Location = new System.Drawing.Point(694, 251);
 			this.textBox2.Name = "textBox2";
+			this.textBox2.ReadOnly = true;
 			this.textBox2.Size = new System.Drawing.Size(50, 20);
 			this.textBox2.TabIndex = 6;
+			this.textBox2.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
 			// 
 			// textBox3
 			// 
 			this.textBox3.Location = new System.Drawing.Point(694, 338);
 			this.textBox3.Name = "textBox3";
+			this.textBox3.ReadOnly = true;
 			this.textBox3.Size = new System.Drawing.Size(50, 20);
 			this.textBox3.TabIndex = 8;
+			this.textBox3.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
 			// 
 			// button3
 			// 
@@ -227,8 +233,10 @@
 			// 
 			this.textBox4.Location = new System.Drawing.Point(694, 419);
 			this.textBox4.Name = "textBox4";
+			this.textBox4.ReadOnly = true;
 			this.textBox4.Size = new System.Drawing.Size(50, 20);
 			this.textBox4.TabIndex = 10;
+			this.textBox4.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
 			// 
 			// label7
 			// 
