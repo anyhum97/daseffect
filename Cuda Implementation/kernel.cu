@@ -223,6 +223,8 @@ namespace ColorInterpretators
 	}
 
 	////////////////////////////////////////////////////////////////////////
+	
+	const unsigned int Count = 5;
 
 	__device__ ColorInterpretator Interpretators[] = 
 	{
@@ -233,8 +235,6 @@ namespace ColorInterpretators
 		Fog,
 
 	};
-
-	const unsigned int Count = 5;
 
 	char* Titles[] = 
 	{
@@ -472,6 +472,11 @@ void CudaFree()
 	Free(MinValueBuffer);
 
 	Free(SumBuffer);
+	
+	Free(MaxValue);
+	Free(MinValue);
+
+	Free(Sum);
 
 	IsLoaded = false;
 }
@@ -508,7 +513,7 @@ extern "C" __declspec(dllexport)
 
 bool CudaGetState(float* buffer, int width, int height)
 {
-	if(width < 3 || height < 3)
+	if(width < 3 || height < 3 || height > 1024)
 	{
 		return false;
 	}
@@ -541,7 +546,12 @@ extern "C" __declspec(dllexport)
 
 bool CudaSetState(float* buffer, int width, int height)
 {
-	if(buffer == nullptr || width < 3 || height < 3)
+	if(buffer == nullptr)
+	{
+		return false;
+	}
+
+	if(width < 3 || height < 3 || height > 1024)
 	{
 		return false;
 	}
@@ -709,7 +719,7 @@ int GetColorInterpretatorTitle(char* str, int ColorInterpretatorIndex)
 	}
 
 	int len = strlen(ColorInterpretators::Titles[ColorInterpretatorIndex]);
-	memcpy(str, ColorInterpretators::Titles[ColorInterpretatorIndex], len);	
+	memcpy(str, ColorInterpretators::Titles[ColorInterpretatorIndex], len > 64 ? 64 : len);
 	return len;
 }
 

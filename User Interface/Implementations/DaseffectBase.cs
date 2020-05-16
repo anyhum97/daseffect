@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace User_Interface
 {
@@ -39,10 +36,14 @@ namespace User_Interface
 				_corruptionRate = value;
 
 				if(_corruptionRate < MinCorruptionRate)
+				{
 					_corruptionRate = MinCorruptionRate;
+				}
 
 				if(_corruptionRate > MaxCorruptionRate)
+				{
 					_corruptionRate = MaxCorruptionRate;
+				}
 			}
 		}
 
@@ -63,10 +64,14 @@ namespace User_Interface
 				_waterLevel = value;
 
 				if(_waterLevel < MinWaterLevel)
+				{
 					_waterLevel = MinWaterLevel;
+				}
 
 				if(_waterLevel > MaxWaterLevel)
+				{
 					_waterLevel = MaxWaterLevel;
+				}
 			}
 		}
 
@@ -88,10 +93,14 @@ namespace User_Interface
 				_phaseSpeed = value;
 
 				if(_phaseSpeed < MinPhaseSpeed)
+				{
 					_phaseSpeed = MinPhaseSpeed;
+				}
 
 				if(_phaseSpeed > MaxPhaseSpeed)
+				{
 					_phaseSpeed = MaxPhaseSpeed;
+				}
 			}
 		}
 
@@ -107,11 +116,11 @@ namespace User_Interface
 		/// </summary>
 		public int Height { get; protected set; }
 		
-		public int IterationCount { get; protected set; } = 0;
+		public int IterationCount { get; protected set; } = default;
 
 		public int ColorInterpretatorCount { get; protected set; }
 
-		public int ColorInterpretatorIndex { get; set; } = 0;
+		public int ColorInterpretatorIndex { get; protected set; } = default;
 
 		public abstract bool IsValid();
 

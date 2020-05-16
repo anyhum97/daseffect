@@ -51,15 +51,12 @@
     <Compile Include="Form1.Designer.cs">
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
-    <Compile Include="Implementations\Cuda\CudaAdaptor.cs" />
+    <Compile Include="Implementations\Cuda\CudaAdapter.cs" />
     <Compile Include="Implementations\DaseffectBase.cs" />
     <Compile Include="Implementations\Native\ColorCollection.cs" />
     <Compile Include="Implementations\Native\Daseffect.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ViewModel.cs">
-      <SubType>Form</SubType>
-    </Compile>
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
     </EmbeddedResource>
