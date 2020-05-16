@@ -4,7 +4,7 @@ using System.Drawing;
 
 namespace User_Interface
 {
-	public abstract class DaseffectBase
+	public abstract class DaseffectBase : IDisposable
 	{
 		protected Random _random;
 
@@ -142,6 +142,8 @@ namespace User_Interface
 		public abstract List<string> GetColorInterpretatorsTitle();
 
 		public abstract void SetColorInterpretator(int index);
+
+		public abstract void Dispose();
 	}
 }
 

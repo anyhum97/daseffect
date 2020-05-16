@@ -697,6 +697,11 @@ namespace User_Interface
 				ColorInterpretatorIndex = index;
 			}
 		}
+
+		public override void Dispose()
+		{
+			
+		}
 	}
 }
 

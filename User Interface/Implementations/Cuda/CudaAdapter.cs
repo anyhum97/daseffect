@@ -7,7 +7,7 @@ using System.Windows.Forms;
 
 namespace User_Interface
 {
-	public sealed class CudaAdapter : DaseffectBase, IDisposable
+	public sealed class CudaAdapter : DaseffectBase
 	{
 		/// <summary>
 		/// Used in frame transactions.
@@ -121,10 +121,9 @@ namespace User_Interface
 			Ready = true;
 		}
 
-		public void Dispose()
+		public override void Dispose()
 		{
 			CudaFree();
-			GC.SuppressFinalize(this);
 		}
 
 		public override bool IsValid()

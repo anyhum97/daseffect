@@ -478,6 +478,8 @@ void CudaFree()
 
 	Free(Sum);
 
+	cudaDeviceReset();
+
 	IsLoaded = false;
 }
 

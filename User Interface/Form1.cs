@@ -414,14 +414,7 @@ namespace User_Interface
 
 		private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
 		{
-			int index = comboBox1.SelectedIndex;
-
-			if(index > 1)
-			{
-				index = 1;
-			}
-
-			InitializePhysicalModel(index);
+			InitializePhysicalModel(comboBox1.SelectedIndex);
 			UpdateComboBox2Items(false);
 		}
 
@@ -492,14 +485,8 @@ namespace User_Interface
 
 		private void button6_Click(object sender, EventArgs e)
 		{
-			int index = comboBox1.SelectedIndex;
-
-			if(index > 1)
-			{
-				index = 1;
-			}
-
-			InitializePhysicalModel(index);
+			InitializePhysicalModel(comboBox1.SelectedIndex);
+			UpdateComboBox2Items(false);
 		}
 		
 		private string Float2<Type>(Type value) where Type: struct

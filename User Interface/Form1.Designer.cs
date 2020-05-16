@@ -1,4 +1,6 @@
-﻿namespace User_Interface
+﻿using System.Threading;
+
+namespace User_Interface
 {
 	partial class Form1
 	{
@@ -17,6 +19,7 @@
 			{
 				components.Dispose();
 			}
+			daseffect.Dispose();
 			base.Dispose(disposing);
 		}
 
@@ -257,7 +260,7 @@
 			this.trackBar4.Name = "trackBar4";
 			this.trackBar4.Size = new System.Drawing.Size(144, 45);
 			this.trackBar4.TabIndex = 9;
-			this.trackBar4.Value = 4;
+			this.trackBar4.Value = 1;
 			this.trackBar4.Scroll += new System.EventHandler(this.trackBar4_Scroll);
 			// 
 			// button1
