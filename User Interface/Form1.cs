@@ -12,7 +12,7 @@ using System.Windows.Forms;
 
 namespace User_Interface
 {
-	public partial class Form1 : Form
+	public sealed partial class Form1 : Form
 	{
 		#region fields
 
@@ -252,7 +252,7 @@ namespace User_Interface
 
 		private void Form1_NotifyCorruptionRateChanged(object sender, EventArgs e)
 		{
-			textBox2.Text = Float2(CorruptionRate);
+			textBox2.Text = Float2((float)CorruptionRate);
 		}
 		
 		private void Form1_NotifyPhaseSpeedChanged(object sender, EventArgs e)
@@ -318,7 +318,7 @@ namespace User_Interface
 			}
 		}
 
-		private void StartTimer(int interval = 100)
+		private void StartTimer(int interval = 80)
 		{
 			_timer = new Timer();
 
@@ -489,7 +489,7 @@ namespace User_Interface
 			UpdateComboBox2Items(false);
 		}
 		
-		private string Float2<Type>(Type value) where Type: struct
+		private string Float2(float value)
 		{
 			return string.Format(CultureInfo.InvariantCulture, "{0:F2}", value);
 		}
