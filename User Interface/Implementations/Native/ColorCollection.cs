@@ -4,25 +4,13 @@ using System.Drawing;
 
 namespace User_Interface
 {
-	public enum ColorInterpretationType
-	{
-		Default,
-		Boolean,
-		Landscape,
-		WaterFlow,
-		Fog,
-		Pie,
-	}
-
 	public partial class Daseffect
 	{
 		protected delegate Color ColorInterpretator(float value, float minValue, float maxValue, float waterLevel);
 
 		protected static readonly ColorInterpretator[] _colorInterpretators;
 
-		protected static List<string> colorInterpretators;
-		
-		public ColorInterpretationType CurrentColorInterpretator { get; set; } = default;
+		protected static List<string> _colorInterpretatorsTitle;
 
 		static Daseffect()
 		{
@@ -35,21 +23,21 @@ namespace User_Interface
 				GetFogColor,
 			};
 
-			colorInterpretators = new List<string>();
+			_colorInterpretatorsTitle = new List<string>();
 
-			colorInterpretators.Add("Default Color");
-			colorInterpretators.Add("Boolean Color");
-			colorInterpretators.Add("Landscape");
-			colorInterpretators.Add("Water Flow");
-			colorInterpretators.Add("Fog");
+			_colorInterpretatorsTitle.Add("Default Color");
+			_colorInterpretatorsTitle.Add("Boolean Color");
+			_colorInterpretatorsTitle.Add("Landscape");
+			_colorInterpretatorsTitle.Add("Water Flow");
+			_colorInterpretatorsTitle.Add("Fog");
 		}
 
-		protected Color GetColor(float value, float minValue, float maxValue, float waterLevel)
+		protected virtual Color GetColor(float value, float minValue, float maxValue, float waterLevel)
 		{
 			return _colorInterpretators[ColorInterpretatorIndex](value, minValue, maxValue, waterLevel);
 		}
 
-		private static Color MixColor(Color color1, Color color2, float value, float border1, float border2)
+		protected static Color MixColor(Color color1, Color color2, float value, float border1, float border2)
 		{
 			float distance1 = Math.Abs(border1-value);
 			float distance2 = Math.Abs(border2-value);
@@ -62,7 +50,7 @@ namespace User_Interface
 								  (int)(color1.B*value1 + color2.B*value2));
 		}
 
-		private static Color GetDefaultColor(float value, float MinValue, float MaxValue, float waterLevel)
+		protected static Color GetDefaultColor(float value, float MinValue, float MaxValue, float waterLevel)
 		{
 			// This Method Returns Color Based on Input Value
 
@@ -85,7 +73,7 @@ namespace User_Interface
 			}
 		}
 		
-		private static Color GetBooleanColor(float value, float MinValue, float MaxValue, float waterLevel)
+		protected static Color GetBooleanColor(float value, float MinValue, float MaxValue, float waterLevel)
 		{
 			// This Method Returns Color Based on Input Value
 
@@ -102,7 +90,7 @@ namespace User_Interface
 			return Color.Black;
 		}
 
-		private static Color GetLandscapeColor(float value, float MinValue, float MaxValue, float waterLevel)
+		protected static Color GetLandscapeColor(float value, float MinValue, float MaxValue, float waterLevel)
 		{
 			// This Method Returns Color Based on Input Value
 
@@ -148,7 +136,7 @@ namespace User_Interface
 			return Color.White;
 		}
 
-		private static Color GetWaterFlowColor(float value, float MinValue, float MaxValue, float waterLevel)
+		protected static Color GetWaterFlowColor(float value, float MinValue, float MaxValue, float waterLevel)
 		{
 			value = value - MinValue;
 
@@ -169,7 +157,7 @@ namespace User_Interface
 			return MixColor(Color.FromArgb(215, 172, 2), Color.FromArgb(11, 237, 5), value, waterLevel, 0.9f);
 		}
 
-		private static Color GetFogColor(float value, float MinValue, float MaxValue, float waterLevel)
+		protected static Color GetFogColor(float value, float MinValue, float MaxValue, float waterLevel)
 		{
 			value = value - MinValue;
 
@@ -185,7 +173,7 @@ namespace User_Interface
 			return MixColor(Color.FromArgb(45, 45, 84), Color.FromArgb(235, 235, 255), value, 0.0f, 1.0f);
 		}
 
-		private static Color GetPieColor(float value, float MinValue, float MaxValue, float waterLevel)
+		protected static Color GetPieColor(float value, float MinValue, float MaxValue, float waterLevel)
 		{
 			value = value - MinValue;
 

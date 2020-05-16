@@ -2,9 +2,6 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace User_Interface
 {
@@ -13,17 +10,17 @@ namespace User_Interface
 		/// <summary>
 		/// Stores the current state of the physical model.
 		/// </summary>
-		private float[][][] Buffer { get; set; }	// [Dimensions][Width][Height];
+		protected float[][][] Buffer { get; set; }	// [Dimensions][Width][Height];
 
-		private float _bufferMinValue;
-		private float _bufferMaxValue;
-		private float _bufferSum;
+		protected float _bufferMinValue;
+		protected float _bufferMaxValue;
+		protected float _bufferSum;
 
 		/// <summary>
 		/// Shows Should Metrics be Recalculated;
 		/// Metrics: _bufferMinValue, _bufferMaxValue;
 		/// </summary>
-		private bool ReCount { get; set; }
+		protected bool ReCount { get; set; }
 
 		public bool Optimazed { get; set; }
 
@@ -97,7 +94,7 @@ namespace User_Interface
 			Ready = true;
 		}
 
-		private static int CoordinateConvertor(int value, int border)
+		protected static int CoordinateConvertor(int value, int border)
 		{
 			// This Method Converts Buffer Coordinates in a Certain Way:
 			
@@ -123,12 +120,12 @@ namespace User_Interface
 			return value;
 		}
 
-		private bool IsHappened()
+		protected virtual bool IsHappened()
 		{
 			return _random.NextDouble() <= CorruptionRate;
 		}
 
-		private void Count()
+		protected virtual void Count()
 		{
 			if(ReCount)
 			{
@@ -178,30 +175,22 @@ namespace User_Interface
 				return false;
 			}
 
-			try
-			{
-				float value = Buffer[2][Width-1][Height-1];
-			}
-			catch
-			{
-				return false;
-			}
-
 			return true;
 		}
 
-		public void Clear()
+		public virtual void Clear()
 		{
 			Buffer = null;
 
 			RandomSeed = 0;
 
-			CurrentColorInterpretator = default;
-
 			CorruptionRate = DefaultCorruptionRate;
+
 			WaterLevel = DefaultWaterLevel;
 			PhaseSpeed = DefaultPhaseSpeed;
-			
+
+			ColorInterpretatorIndex = 0;
+
 			_random = new Random();
 
 			_bufferMinValue = default;
@@ -217,7 +206,7 @@ namespace User_Interface
 			Ready = false;
 		}
 
-		public float Get(int dim, int x, int y)
+		public virtual float Get(int dim, int x, int y)
 		{
 			// This Method Allows to Get the Buffer Element
 
@@ -243,7 +232,7 @@ namespace User_Interface
 			return Buffer[dim][x][y];
 		}
 
-		public void Set(int dim, int x, int y, float value)
+		public virtual void Set(int dim, int x, int y, float value)
 		{
 			// This Method Allows to Set the Buffer Element
 			
@@ -698,7 +687,7 @@ namespace User_Interface
 
 		public override List<string> GetColorInterpretatorsTitle()
 		{
-			return colorInterpretators;
+			return _colorInterpretatorsTitle;
 		}
 
 		public override void SetColorInterpretator(int index)
@@ -710,3 +699,5 @@ namespace User_Interface
 		}
 	}
 }
+
+

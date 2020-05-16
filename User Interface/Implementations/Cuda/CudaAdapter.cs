@@ -7,7 +7,7 @@ using System.Windows.Forms;
 
 namespace User_Interface
 {
-	public sealed class CudaAdaptor : DaseffectBase, IDisposable
+	public sealed class CudaAdapter : DaseffectBase, IDisposable
 	{
 		/// <summary>
 		/// Used in frame transactions.
@@ -58,12 +58,12 @@ namespace User_Interface
 		public float IterationTime { get; private set; }
 		public float FrameTime { get; private set; }
 
-		public CudaAdaptor()
+		public CudaAdapter()
 		{
 			Clear();
 		}
 
-		public CudaAdaptor(int width, int height, int seed = 0)
+		public CudaAdapter(int width, int height, int seed = 0)
 		{
 			Ready = false;
 
@@ -72,19 +72,23 @@ namespace User_Interface
 				throw new ArgumentException("> Daseffect: Invalid Field Size");
 			}
 
+			string errorMessage = "Unable to start the GPU version.\nCheck if you have a suitable device";
+
 			if(!CudaStart(width, height))
 			{
-				MessageBox.Show("Unable to start the GPU version.\nCheck if you have a suitable device");
+				MessageBox.Show(errorMessage);
 				return;
 			}
 
 			if(!SetDefaultState())
 			{
+				MessageBox.Show(errorMessage);
 				return;
 			}
 
 			if(!GetCudaStatus(width, height))
 			{
+				MessageBox.Show(errorMessage);
 				return;
 			}
 
@@ -120,7 +124,6 @@ namespace User_Interface
 		public void Dispose()
 		{
 			CudaFree();
-
 			GC.SuppressFinalize(this);
 		}
 
@@ -154,8 +157,10 @@ namespace User_Interface
 			CorruptionRate = DefaultCorruptionRate;
 			WaterLevel = DefaultWaterLevel;
 			PhaseSpeed = DefaultPhaseSpeed;
+			ColorInterpretatorIndex = 0;
 
 			RandomSeed = 0;
+			IterationCount = 0;
 
 			Width = 0;
 			Height = 0;
@@ -272,7 +277,7 @@ namespace User_Interface
 
 			for(int i=0; i<count; ++i)
 			{
-				StringBuilder stringBuilder = new StringBuilder(32);
+				StringBuilder stringBuilder = new StringBuilder(64);
 
 				int len = GetColorInterpretatorTitle(stringBuilder, i);
 

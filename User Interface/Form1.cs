@@ -16,6 +16,37 @@ namespace User_Interface
 	{
 		private DaseffectBase daseffect;
 
+		private Timer _timer;
+
+		private string _lastDirectoryPath = null;
+
+		private int _counter = 0;
+
+		private bool _isRendering = false;
+
+		public const int DefaultFramesPerOperation = 1;
+
+		public const int MinFramesPerOperation = 1;
+		public const int MaxFramesPerOperation = 128;
+
+		private int _framesPerOperation = DefaultFramesPerOperation;
+
+		public int FramesPerOperation
+		{
+			get => _framesPerOperation;
+			
+			set
+			{
+				_framesPerOperation = value;
+
+				if(_framesPerOperation < MinFramesPerOperation)
+					_framesPerOperation = MinFramesPerOperation;
+
+				if(_framesPerOperation > MaxFramesPerOperation)
+					_framesPerOperation = MaxFramesPerOperation;
+			}
+		}
+
 		public Bitmap CurrentBitmap { get; set; }
 
 		public Form1()
@@ -53,7 +84,7 @@ namespace User_Interface
 			}
 			else
 			{
-				daseffect = new CudaAdaptor(512, 512);
+				daseffect = new CudaAdapter(512, 512);
 			}
 
 			daseffect.AddNoise(0.001f, 0.1f, 0.005f);
@@ -155,7 +186,14 @@ namespace User_Interface
 						comboBox2.Items.Add(title);
 					}
 
-					comboBox2.SelectedIndex = 0;
+					if(comboBox2.Items.Count > 3)
+					{
+						comboBox2.SelectedIndex = 3;
+					}
+					else
+					{
+						comboBox2.SelectedIndex = 0;
+					}
 				}
 			}
 		}

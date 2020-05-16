@@ -75,7 +75,7 @@
 			this.label1.Size = new System.Drawing.Size(150, 23);
 			this.label1.TabIndex = 1;
 			this.label1.Text = "Iteration: 0 ms";
-			this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+			this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// comboBox2
 			// 
