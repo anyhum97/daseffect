@@ -19,7 +19,12 @@ namespace User_Interface
 			{
 				components.Dispose();
 			}
-			daseffect.Dispose();
+
+			if(daseffect != null)
+			{
+				daseffect.Dispose();
+			}
+
 			base.Dispose(disposing);
 		}
 
