@@ -7,7 +7,7 @@
     <ProjectGuid>{DDC2DB1F-8BF7-48FA-B84E-85AEF649CDFC}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <RootNamespace>User_Interface</RootNamespace>
-    <AssemblyName>User Interface</AssemblyName>
+    <AssemblyName>daseffect</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
