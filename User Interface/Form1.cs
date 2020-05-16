@@ -14,8 +14,46 @@ namespace User_Interface
 {
 	public partial class Form1 : Form
 	{
-		private DaseffectBase daseffect;
+		private DaseffectBase _daseffect;
 
+<<<<<<< Updated upstream
+=======
+		private Timer _timer;
+
+		private string _lastDirectoryPath = null;
+
+		private int _counter = 0;
+
+		private bool _isRendering = false;
+
+		public const int DefaultFramesPerOperation = 1;
+
+		public const int MinFramesPerOperation = 1;
+		public const int MaxFramesPerOperation = 128;
+
+		private int _framesPerOperation = DefaultFramesPerOperation;
+
+		public int FramesPerOperation
+		{
+			get => _framesPerOperation;
+			
+			set
+			{
+				_framesPerOperation = value;
+
+				if(_framesPerOperation < MinFramesPerOperation)
+				{
+					_framesPerOperation = MinFramesPerOperation;
+				}
+
+				if(_framesPerOperation > MaxFramesPerOperation)
+				{
+					_framesPerOperation = MaxFramesPerOperation;
+				}
+			}
+		}
+
+>>>>>>> Stashed changes
 		public Bitmap CurrentBitmap { get; set; }
 
 		public Form1()
@@ -49,14 +87,18 @@ namespace User_Interface
 
 			if(modelType == 0)
 			{
-				daseffect = new Daseffect(512, 512);
+				_daseffect = new Daseffect(512, 512);
 			}
 			else
 			{
+<<<<<<< Updated upstream
 				daseffect = new CudaAdaptor(512, 512);
+=======
+				_daseffect = new CudaAdapter(512, 512);
+>>>>>>> Stashed changes
 			}
 
-			daseffect.AddNoise(0.001f, 0.1f, 0.005f);
+			_daseffect.AddNoise(0.001f, 0.1f, 0.005f);
 
 			_isRendering = saveState;
 
@@ -86,9 +128,9 @@ namespace User_Interface
 		{
 			CurrentBitmap = null;
 
-			if(daseffect != null && daseffect.IsValid())
+			if(_daseffect != null && _daseffect.IsValid())
 			{
-				CurrentBitmap = daseffect.GetBitmap();
+				CurrentBitmap = _daseffect.GetBitmap();
 			}
 			
 			pictureBox1.Image = CurrentBitmap;
@@ -96,11 +138,11 @@ namespace User_Interface
 
 		private void UpdateItems()
 		{
-			if(daseffect != null && daseffect.IsValid())
+			if(_daseffect != null && _daseffect.IsValid())
 			{
-				textBox1.Text = Float2(daseffect.WaterLevel);
-				textBox2.Text = Float2(daseffect.CorruptionRate);
-				textBox3.Text = Float2(daseffect.PhaseSpeed);
+				textBox1.Text = Float2(_daseffect.WaterLevel);
+				textBox2.Text = Float2(_daseffect.CorruptionRate);
+				textBox3.Text = Float2(_daseffect.PhaseSpeed);
 				textBox4.Text = FramesPerOperation.ToString();
 
 				trackBar4.Value = (int)((float)FramesPerOperation/MaxFramesPerOperation*trackBar4.Maximum+0.5f);
@@ -116,9 +158,9 @@ namespace User_Interface
 		{
 			if(_isRendering)
 			{
-				if(daseffect != null && daseffect.IsValid())
+				if(_daseffect != null && _daseffect.IsValid())
 				{
-					var time = daseffect.Iteration(FramesPerOperation);
+					var time = _daseffect.Iteration(FramesPerOperation);
 
 					label1.Text = "iteration: " + Float2(time) + "ms";
 
@@ -146,9 +188,9 @@ namespace User_Interface
 		{
 			comboBox2.Items.Clear();
 
-			if(daseffect != null)
+			if(_daseffect != null)
 			{
-				List<string> list = daseffect.GetColorInterpretatorsTitle();
+				List<string> list = _daseffect.GetColorInterpretatorsTitle();
 
 				if(list != null && list.Count > 0)
 				{
@@ -164,9 +206,9 @@ namespace User_Interface
 
 		private void Tick()
 		{
-			if(daseffect != null)
+			if(_daseffect != null)
 			{
-				var time = daseffect.Iteration(1);
+				var time = _daseffect.Iteration(1);
 				label1.Text = "iteration: " + Float2(time) + "ms";
 				UpdateImage();
 			}
@@ -174,9 +216,9 @@ namespace User_Interface
 
 		private void SaveImage()
 		{
-			if(daseffect != null && daseffect.IsValid())
+			if(_daseffect != null && _daseffect.IsValid())
 			{
-				string directoryPath = daseffect.RandomSeed.ToString();
+				string directoryPath = _daseffect.RandomSeed.ToString();
 
 				try
 				{
@@ -185,7 +227,7 @@ namespace User_Interface
 						Directory.CreateDirectory(directoryPath);
 					}
 
-					string filePath = daseffect.IterationCount.ToString();
+					string filePath = _daseffect.IterationCount.ToString();
 
 					if(File.Exists(filePath))
 					{
@@ -223,16 +265,16 @@ namespace User_Interface
 
 		private void comboBox2_SelectedIndexChanged(object sender, EventArgs e)
 		{
-			daseffect.SetColorInterpretator(comboBox2.SelectedIndex);
+			_daseffect.SetColorInterpretator(comboBox2.SelectedIndex);
 			UpdateImage();
 		}
 
 		private void trackBar2_Scroll(object sender, EventArgs e)
 		{
 			float factor = (float)trackBar2.Value / trackBar2.Maximum;
-			daseffect.WaterLevel = factor;
-			trackBar2.Value = (int)(daseffect.WaterLevel * trackBar2.Maximum+0.5f);
-			textBox1.Text = Float2(daseffect.WaterLevel);
+			_daseffect.WaterLevel = factor;
+			trackBar2.Value = (int)(_daseffect.WaterLevel * trackBar2.Maximum+0.5f);
+			textBox1.Text = Float2(_daseffect.WaterLevel);
 			
 			if(!_isRendering)
 			{
@@ -243,17 +285,17 @@ namespace User_Interface
 		private void trackBar1_Scroll(object sender, EventArgs e)
 		{
 			float factor = (float)trackBar1.Value / trackBar1.Maximum;
-			daseffect.CorruptionRate = factor;
-			trackBar1.Value = (int)(daseffect.CorruptionRate * trackBar2.Maximum+0.5f);
-			textBox2.Text = Float2(daseffect.CorruptionRate);
+			_daseffect.CorruptionRate = factor;
+			trackBar1.Value = (int)(_daseffect.CorruptionRate * trackBar2.Maximum+0.5f);
+			textBox2.Text = Float2(_daseffect.CorruptionRate);
 		}
 
 		private void trackBar3_Scroll(object sender, EventArgs e)
 		{
 			float factor = Daseffect.MaxPhaseSpeed * (float)trackBar3.Value / trackBar3.Maximum;
-			daseffect.PhaseSpeed = factor;
-			trackBar3.Value = (int)(daseffect.PhaseSpeed * trackBar2.Maximum / Daseffect.MaxPhaseSpeed + 0.5f);
-			textBox3.Text = Float2(daseffect.PhaseSpeed);
+			_daseffect.PhaseSpeed = factor;
+			trackBar3.Value = (int)(_daseffect.PhaseSpeed * trackBar2.Maximum / Daseffect.MaxPhaseSpeed + 0.5f);
+			textBox3.Text = Float2(_daseffect.PhaseSpeed);
 		}
 
 		private void trackBar4_Scroll(object sender, EventArgs e)
