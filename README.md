@@ -7,7 +7,7 @@ daseffect Project:
 </p>
 
 <p>
-  There is an GPU(Cuda C) parallel implementation.<br>
+  There is a GPU(Cuda C) parallel implementation.<br>
   To Build Cuda C project download and install CUDA Toolkit:<br>
   https://developer.nvidia.com/cuda-toolkit<br>
 </p>
