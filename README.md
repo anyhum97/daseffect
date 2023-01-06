@@ -28,5 +28,3 @@ daseffect Project:
 <p>
 <!img src="Pictures/Fog.gif" width="256" height="256">
 </p>
-  
-anyhum@yandex.ru
